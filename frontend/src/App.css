@@ -1,38 +1,263 @@
-.App {
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #172033;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-.App-header {
-  background-color: #282c34;
+.appShell {
   min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+
+.sidebar {
+  background: #101828;
+  color: white;
+  padding: 24px 18px;
+}
+
+.brand {
   display: flex;
-  flex-direction: column;
+  gap: 12px;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  margin-bottom: 32px;
+}
+
+.brandMark {
+  width: 40px;
+  height: 40px;
+  background: #2f80ed;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+}
+
+.brand small {
+  display: block;
+  color: #b9c2d0;
+}
+
+.navList {
+  display: grid;
+  gap: 8px;
+}
+
+.navItem {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #d9e2ef;
+  padding: 11px 12px;
+  border-radius: 8px;
+}
+
+.navItem:hover,
+.navItem.active {
+  background: #24324a;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.navbar {
+  min-height: 82px;
+  background: white;
+  border-bottom: 1px solid #e6eaf2;
+  padding: 18px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.navbar h1 {
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #5d6b82;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.navbarActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.searchBox {
+  min-width: 260px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #d9e0ea;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.searchBox input {
+  border: 0;
+  outline: 0;
+}
+
+.iconButton,
+.profileButton,
+.primaryButton {
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.iconButton {
+  width: 42px;
+  height: 42px;
+}
+
+.profileButton {
+  height: 42px;
+  padding: 0 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pageContent {
+  padding: 28px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.statCard,
+.panel,
+.authPanel {
+  background: white;
+  border: 1px solid #e6eaf2;
+  border-radius: 8px;
+  padding: 22px;
+}
+
+.statCard strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 32px;
+}
+
+.contentGrid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 18px;
+}
+
+.taskList,
+.activityList {
+  display: grid;
+  gap: 10px;
+}
+
+.taskList p,
+.activityList p {
+  margin: 0;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.authPage,
+.notFoundPage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #eef4ff;
+  padding: 24px;
+}
+
+.authPanel {
+  width: min(430px, 100%);
+}
+
+.authPanel.wide {
+  width: min(680px, 100%);
+}
+
+.formStack,
+.formGrid {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.formGrid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.formStack label,
+.formGrid label {
+  display: grid;
+  gap: 7px;
+  font-weight: bold;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid #d0d7e2;
+  border-radius: 8px;
+  padding: 11px 12px;
+}
+
+.primaryButton {
+  min-height: 44px;
+  background: #1f6feb;
+  color: white;
+  font-weight: bold;
+  padding: 0 16px;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.mutedText {
+  color: #667085;
+}
+
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 18px;
+}
+
+@media (max-width: 900px) {
+  .appShell,
+  .statsGrid,
+  .formGrid,
+  .contentGrid {
+    grid-template-columns: 1fr;
   }
-  to {
-    transform: rotate(360deg);
+
+  .navbar,
+  .navbarActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBox {
+    min-width: 0;
   }
 }
