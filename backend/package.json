@@ -1,17 +1,17 @@
 {
-  "name": "placement management system - backend",
+  "name": "backend",
   "version": "1.0.0",
-  "description": "This is the core backend for managing student job placement",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "express": "^5.2.1",
-    "mongoose": "^9.7.1"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.24.0"
   }
 }
