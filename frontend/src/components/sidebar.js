@@ -1,8 +1,17 @@
-import { BriefcaseBusiness, Building2, ChartColumn, FileText, LayoutDashboard, Users } from 'lucide-react';
+import {
+  BriefcaseBusiness,
+  Building2,
+  ChartColumn,
+  FileText,
+  LayoutDashboard,
+  UserCircle,
+  Users,
+} from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const navItems = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/student/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/student/profile', label: 'Profile', icon: UserCircle },
   { to: '/students', label: 'Students', icon: Users },
   { to: '/companies', label: 'Companies', icon: Building2 },
   { to: '/jobs', label: 'Jobs', icon: BriefcaseBusiness },
@@ -20,9 +29,11 @@ function Sidebar() {
           <small>Campus portal</small>
         </div>
       </div>
+
       <nav className="navList" aria-label="Main navigation">
         {navItems.map((item) => {
           const Icon = item.icon;
+
           return (
             <NavLink className="navItem" to={item.to} key={item.to}>
               <Icon size={18} />

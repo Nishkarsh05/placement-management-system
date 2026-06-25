@@ -2,16 +2,18 @@ const jwt = require('jsonwebtoken');
 const User = require('../model/user');
 
 const createToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'dev_secret_change_me', {
-    expiresIn: '7d',
-  });
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET || 'placement_secret_key_123',
+    { expiresIn: '7d' }
+  );
 };
 
-const sendAuthResponse = (res, user, statusCode = 200) => {
+const sendUserResponse = (res, user, statusCode) => {
   const token = createToken(user._id);
 
   res.status(statusCode).json({
-    message: 'Authentication successful',
+    message: 'Success',
     token,
     user: {
       id: user._id,
@@ -26,13 +28,13 @@ const sendAuthResponse = (res, user, statusCode = 200) => {
 
 const register = async (req, res) => {
   try {
-    const { name, email, phone, role, department, password } = req.body;
+    const { name, email, password, phone, role, department } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Name, email, and password are required' });
+      return res.status(400).json({ message: 'Name, email and password are required' });
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
 
     if (existingUser) {
       return res.status(409).json({ message: 'User already exists with this email' });
@@ -41,13 +43,13 @@ const register = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      phone,
-      role,
-      department,
       password,
+      phone,
+      role: role ? role.toLowerCase() : 'student',
+      department,
     });
 
-    sendAuthResponse(res, user, 201);
+    sendUserResponse(res, user, 201);
   } catch (error) {
     res.status(500).json({ message: 'Registration failed', error: error.message });
   }
@@ -61,17 +63,21 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({
+      email: email.toLowerCase().trim(),
+    }).select('+password');
 
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    if (!user.isActive) {
-      return res.status(403).json({ message: 'This account is disabled' });
+    const passwordMatches = await user.comparePassword(password);
+
+    if (!passwordMatches) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    sendAuthResponse(res, user);
+    sendUserResponse(res, user, 200);
   } catch (error) {
     res.status(500).json({ message: 'Login failed', error: error.message });
   }

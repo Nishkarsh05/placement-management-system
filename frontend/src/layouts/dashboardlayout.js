@@ -1,12 +1,13 @@
 import { Outlet } from 'react-router-dom';
-import Navbar from '../components/navbar';
 import Sidebar from '../components/sidebar';
+import Navbar from '../components/navbar';
 
 function DashboardLayout() {
   return (
     <div className="appShell">
       <Sidebar />
-      <main className="mainPanel">
+
+      <main className="mainArea">
         <Navbar />
         <section className="pageContent">
           <Outlet />

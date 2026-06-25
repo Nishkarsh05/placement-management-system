@@ -10,7 +10,12 @@ const protect = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret_change_me');
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'placement_secret_key_123'
+    );
+
     const user = await User.findById(decoded.id);
 
     if (!user || !user.isActive) {
@@ -26,8 +31,10 @@ const protect = async (req, res, next) => {
 
 const allowRoles = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'You do not have permission for this action' });
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: 'You do not have permission for this action',
+      });
     }
 
     next();

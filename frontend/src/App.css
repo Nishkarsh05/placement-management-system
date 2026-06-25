@@ -1,26 +1,23 @@
-:root {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #172033;
-  background: #f5f7fb;
-}
-
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #172033;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 button,
 input,
 select {
   font: inherit;
-}
-
-a {
-  color: #1f6feb;
-  text-decoration: none;
 }
 
 .appShell {
@@ -31,31 +28,30 @@ a {
 
 .sidebar {
   background: #101828;
-  color: #fff;
+  color: white;
   padding: 24px 18px;
 }
 
 .brand {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
   margin-bottom: 32px;
 }
 
 .brandMark {
-  display: grid;
-  place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 8px;
   background: #2f80ed;
-  font-weight: 800;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
 }
 
 .brand small {
   display: block;
   color: #b9c2d0;
-  margin-top: 2px;
 }
 
 .navList {
@@ -64,18 +60,18 @@ a {
 }
 
 .navItem {
-  color: #d9e2ef;
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
+  color: #d9e2ef;
   padding: 11px 12px;
   border-radius: 8px;
 }
 
-.navItem.active,
-.navItem:hover {
+.navItem:hover,
+.navItem.active {
   background: #24324a;
-  color: #fff;
+  color: white;
 }
 
 .mainPanel {
@@ -84,51 +80,45 @@ a {
 
 .navbar {
   min-height: 82px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 18px 28px;
-  background: #fff;
+  background: white;
   border-bottom: 1px solid #e6eaf2;
+  padding: 18px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.navbar h1,
-.authPanel h1,
-.notFoundPage h1 {
+.navbar h1 {
   margin: 0;
 }
 
 .eyebrow {
+  margin: 0 0 6px;
   color: #5d6b82;
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0;
-  margin: 0 0 6px;
+  font-weight: bold;
   text-transform: uppercase;
 }
 
 .navbarActions {
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
 }
 
 .searchBox {
   min-width: 260px;
   display: flex;
-  align-items: center;
   gap: 8px;
-  padding: 10px 12px;
+  align-items: center;
   border: 1px solid #d9e0ea;
   border-radius: 8px;
-  color: #667085;
+  padding: 10px 12px;
 }
 
 .searchBox input {
   border: 0;
   outline: 0;
-  width: 100%;
 }
 
 .iconButton,
@@ -142,20 +132,14 @@ a {
 .iconButton {
   width: 42px;
   height: 42px;
-  display: grid;
-  place-items: center;
-  background: #eef2f7;
-  color: #344054;
 }
 
 .profileButton {
-  min-height: 42px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  height: 42px;
   padding: 0 12px;
-  background: #eef2f7;
-  color: #344054;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .pageContent {
@@ -164,25 +148,17 @@ a {
 
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
 .statCard,
 .panel,
 .authPanel {
-  background: #fff;
+  background: white;
   border: 1px solid #e6eaf2;
   border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(16, 24, 40, 0.06);
-}
-
-.statCard {
-  padding: 18px;
-}
-
-.statCard span {
-  color: #667085;
+  padding: 22px;
 }
 
 .statCard strong {
@@ -191,32 +167,17 @@ a {
   font-size: 32px;
 }
 
-.statCard small {
-  display: block;
-  margin-top: 4px;
-  color: #667085;
-}
-
 .contentGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
-  gap: 18px;
   margin-top: 20px;
-}
-
-.panel {
-  padding: 22px;
-}
-
-.panel h2 {
-  margin: 0 0 16px;
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 18px;
 }
 
 .taskList,
 .activityList {
   display: grid;
   gap: 10px;
-  color: #475467;
 }
 
 .taskList p,
@@ -224,7 +185,6 @@ a {
   margin: 0;
   padding: 12px;
   background: #f8fafc;
-  border: 1px solid #eef2f7;
   border-radius: 8px;
 }
 
@@ -233,13 +193,12 @@ a {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px;
   background: #eef4ff;
+  padding: 24px;
 }
 
 .authPanel {
   width: min(430px, 100%);
-  padding: 30px;
 }
 
 .authPanel.wide {
@@ -254,15 +213,14 @@ a {
 }
 
 .formGrid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .formStack label,
 .formGrid label {
   display: grid;
   gap: 7px;
-  color: #344054;
-  font-weight: 700;
+  font-weight: bold;
 }
 
 input,
@@ -271,26 +229,19 @@ select {
   border: 1px solid #d0d7e2;
   border-radius: 8px;
   padding: 11px 12px;
-  color: #172033;
-  background: #fff;
+  background: white;
 }
 
 .primaryButton {
   min-height: 44px;
-  padding: 0 16px;
   background: #1f6feb;
-  color: #fff;
-  font-weight: 800;
+  color: white;
+  font-weight: bold;
+  padding: 0 16px;
 }
 
 .fullWidth {
   grid-column: 1 / -1;
-}
-
-.linkButton {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 18px;
 }
 
 .mutedText {
@@ -300,31 +251,77 @@ select {
 .errorText {
   margin: 0;
   color: #b42318;
-  font-weight: 700;
+  font-weight: bold;
+}
+
+.successText {
+  margin: 0;
+  color: #067647;
+  font-weight: bold;
+}
+
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.profilePage,
+.modulePage {
+  display: grid;
+  gap: 18px;
+}
+
+.profilePage h2,
+.modulePage h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.profileForm,
+.moduleForm {
+  display: grid;
+  gap: 14px;
+  max-width: 780px;
+}
+
+.listGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.listCard {
+  background: #fff;
+  border: 1px solid #e6eaf2;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.listCard h3 {
+  margin: 0 0 8px;
+}
+
+.listCard p {
+  margin: 4px 0;
+  color: #475467;
 }
 
 @media (max-width: 900px) {
-  .appShell {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    position: static;
-  }
-
-  .navbar,
-  .navbarActions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .searchBox {
-    min-width: 0;
-  }
-
+  .appShell,
   .statsGrid,
   .formGrid,
   .contentGrid {
     grid-template-columns: 1fr;
+  }
+
+  .navbar,
+  .navbarActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBox {
+    min-width: 0;
   }
 }

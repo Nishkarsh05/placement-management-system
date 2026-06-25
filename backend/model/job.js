@@ -2,11 +2,7 @@ const mongoose = require('mongoose');
 
 const jobSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    title: { type: String, required: true, trim: true },
     company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Company',
@@ -30,10 +26,7 @@ const jobSchema = new mongoose.Schema(
       minimumCGPA: Number,
       passingYear: Number,
       branches: [String],
-      maxActiveBacklogs: {
-        type: Number,
-        default: 0,
-      },
+      maxActiveBacklogs: { type: Number, default: 0 },
     },
     description: String,
     deadline: Date,

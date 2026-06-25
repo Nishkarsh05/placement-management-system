@@ -34,10 +34,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
     isActive: {
       type: Boolean,
       default: true,
@@ -48,6 +44,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre('save', async function hashPassword(next) {
   if (!this.isModified('password')) return next();
+
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
