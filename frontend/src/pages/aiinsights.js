@@ -11,53 +11,67 @@ function AiInsights() {
         const response = await api.get('/ai/insights');
         setInsights(response.data);
       } catch (err) {
-        setError('AI insights are not connected yet. Backend AI route is needed.');
+        setError('AI backend is not connected yet. Showing smart demo insights.');
       }
     };
 
     loadInsights();
   }, []);
 
+  const recommendedJobs = insights?.recommendedJobs || [
+    {
+      title: 'Frontend Developer',
+      company: 'TCS',
+      match: '86%',
+      reason: 'Strong match with React, JavaScript, and UI skills',
+    },
+    {
+      title: 'MERN Stack Intern',
+      company: 'Infosys',
+      match: '82%',
+      reason: 'Good fit for Node.js, MongoDB, and React projects',
+    },
+    {
+      title: 'Cloud Support Associate',
+      company: 'Amazon',
+      match: '74%',
+      reason: 'Improve networking and Linux skills for better score',
+    },
+  ];
+
   return (
     <div className="pageBlock">
       <div className="pageHeader">
         <div>
-          <p className="eyebrow">Smart Placement Helper</p>
+          <p className="eyebrow">Smart Placement Assistant</p>
           <h2>AI Insights</h2>
         </div>
       </div>
 
-      {error && <p className="errorText">{error}</p>}
+      {error && <p className="softWarning">{error}</p>}
 
       <div className="insightGrid">
         <div className="insightCard">
           <p className="eyebrow">Profile Score</p>
           <h3>{insights?.profileScore || 72}%</h3>
-          <p>
-            Complete your CGPA, skills, resume URL, and LinkedIn profile to improve your placement readiness.
-          </p>
+          <p>Complete resume, CGPA, GitHub, LinkedIn, and projects to improve readiness.</p>
         </div>
 
         <div className="insightCard">
-          <p className="eyebrow">Best Skill Match</p>
-          <h3>{insights?.topSkill || 'React + Node.js'}</h3>
-          <p>
-            Your current profile is strongest for frontend and MERN stack roles.
-          </p>
+          <p className="eyebrow">Best Direction</p>
+          <h3>{insights?.topSkill || 'MERN Stack'}</h3>
+          <p>Your current profile is strongest for frontend and full-stack roles.</p>
         </div>
 
         <div className="insightCard">
-          <p className="eyebrow">Suggested Action</p>
-          <h3>Update Resume</h3>
-          <p>
-            Add project links, internship details, and measurable achievements before applying.
-          </p>
+          <p className="eyebrow">Next Step</p>
+          <h3>Upgrade Resume</h3>
+          <p>Add live project links, internship work, and clear achievement points.</p>
         </div>
       </div>
 
       <div className="tableCard">
         <h3>Recommended Jobs</h3>
-
         <table className="dataTable">
           <thead>
             <tr>
@@ -67,28 +81,12 @@ function AiInsights() {
               <th>Reason</th>
             </tr>
           </thead>
-
           <tbody>
-            {(insights?.recommendedJobs || [
-              {
-                title: 'Frontend Developer',
-                company: 'TCS',
-                match: '86%',
-                reason: 'Matches React, JavaScript, and UI skills',
-              },
-              {
-                title: 'MERN Stack Intern',
-                company: 'Infosys',
-                match: '81%',
-                reason: 'Matches Node.js, MongoDB, and React',
-              },
-            ]).map((job, index) => (
+            {recommendedJobs.map((job, index) => (
               <tr key={index}>
                 <td>{job.title}</td>
                 <td>{job.company}</td>
-                <td>
-                  <span className="statusBadge success">{job.match}</span>
-                </td>
+                <td><span className="statusBadge success">{job.match}</span></td>
                 <td>{job.reason}</td>
               </tr>
             ))}

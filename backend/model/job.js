@@ -2,38 +2,40 @@ const mongoose = require('mongoose');
 
 const jobSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, trim: true },
-    company: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
+    title: {
+      type: String,
       required: true,
+      trim: true,
     },
-    postedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+    companyName: {
+      type: String,
       required: true,
+      trim: true,
     },
-    package: String,
     location: String,
-    experience: String,
+    salaryPackage: String,
     jobType: {
       type: String,
-      enum: ['full_time', 'internship', 'ppo', 'remote', 'hybrid'],
-      default: 'full_time',
+      default: 'Full Time',
     },
-    skillsRequired: [String],
-    eligibility: {
-      minimumCGPA: Number,
-      passingYear: Number,
-      branches: [String],
-      maxActiveBacklogs: { type: Number, default: 0 },
+    skillsRequired: String,
+    minimumCgpa: Number,
+    passingYear: Number,
+    eligibleBranches: String,
+    maxActiveBacklogs: {
+      type: Number,
+      default: 0,
     },
-    description: String,
     deadline: Date,
+    description: String,
     status: {
       type: String,
-      enum: ['draft', 'open', 'closed'],
+      enum: ['open', 'closed'],
       default: 'open',
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   { timestamps: true }

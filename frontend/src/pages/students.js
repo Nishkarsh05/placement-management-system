@@ -1,30 +1,30 @@
+import { useEffect, useState } from 'react';
+import api from '../utils/api';
+
 function Students() {
-  const students = [
-    {
-      id: 1,
-      name: 'Student Three',
-      email: 'student300@gmail.com',
-      department: 'CSE',
-      cgpa: '8.4',
-      status: 'Eligible',
-    },
-    {
-      id: 2,
-      name: 'Rahul Sharma',
-      email: 'rahul@student.com',
-      department: 'IT',
-      cgpa: '7.9',
-      status: 'Eligible',
-    },
-    {
-      id: 3,
-      name: 'Priya Verma',
-      email: 'priya@student.com',
-      department: 'ECE',
-      cgpa: '8.1',
-      status: 'Eligible',
-    },
+  const [students, setStudents] = useState([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadStudents = async () => {
+      try {
+        const response = await api.get('/students');
+        setStudents(response.data.students || []);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Could not load students');
+      }
+    };
+
+    loadStudents();
+  }, []);
+
+  const fallbackStudents = [
+    { name: 'Student Test', email: 'studenttest@gmail.com', department: 'CSE', cgpa: 8.2 },
+    { name: 'Rahul Sharma', email: 'rahul@student.com', department: 'IT', cgpa: 7.8 },
+    { name: 'Priya Verma', email: 'priya@student.com', department: 'ECE', cgpa: 8.6 },
   ];
+
+  const list = students.length ? students : fallbackStudents;
 
   return (
     <div className="pageBlock">
@@ -34,6 +34,8 @@ function Students() {
           <h2>Students</h2>
         </div>
       </div>
+
+      {error && <p className="softWarning">{error}. Showing demo data.</p>}
 
       <div className="tableCard">
         <table className="dataTable">
@@ -46,17 +48,14 @@ function Students() {
               <th>Status</th>
             </tr>
           </thead>
-
           <tbody>
-            {students.map((student) => (
-              <tr key={student.id}>
-                <td>{student.name}</td>
-                <td>{student.email}</td>
-                <td>{student.department}</td>
-                <td>{student.cgpa}</td>
-                <td>
-                  <span className="statusBadge success">{student.status}</span>
-                </td>
+            {list.map((student, index) => (
+              <tr key={student._id || index}>
+                <td>{student.user?.name || student.name}</td>
+                <td>{student.user?.email || student.email}</td>
+                <td>{student.user?.department || student.department || student.branch}</td>
+                <td>{student.cgpa || 'Not added'}</td>
+                <td><span className="statusBadge success">Active</span></td>
               </tr>
             ))}
           </tbody>

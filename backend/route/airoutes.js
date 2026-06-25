@@ -1,13 +1,9 @@
 const express = require('express');
-const {
-  getJobs,
-  createJob,
-} = require('../controller/jobcontroller');
+const { getAiInsights } = require('../controller/aicontroller');
 const { protect } = require('../middleware/authmiddleware');
 
 const router = express.Router();
 
-router.get('/', protect, getJobs);
-router.post('/', protect, createJob);
+router.get('/insights', protect, getAiInsights);
 
 module.exports = router;

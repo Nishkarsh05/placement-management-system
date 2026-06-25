@@ -1,142 +1,115 @@
 import { useEffect, useState } from 'react';
 import api from '../utils/api';
-import { getCurrentUser } from '../utils/auth';
+
+const initialJob = {
+  title: '',
+  companyName: '',
+  location: '',
+  salaryPackage: '',
+  jobType: 'Full Time',
+  skillsRequired: '',
+  minimumCgpa: '',
+  passingYear: '',
+  eligibleBranches: '',
+  maxActiveBacklogs: '',
+  deadline: '',
+  description: '',
+};
 
 function Jobs() {
-  const user = getCurrentUser();
-
+  const [form, setForm] = useState(initialJob);
   const [jobs, setJobs] = useState([]);
-  const [companies, setCompanies] = useState([]);
-  const [form, setForm] = useState({
-    title: '',
-    company: '',
-    package: '',
-    location: '',
-    experience: '',
-    jobType: 'full_time',
-    skillsRequired: '',
-    minimumCGPA: '',
-    passingYear: '',
-    branches: '',
-    maxActiveBacklogs: '',
-    description: '',
-    deadline: '',
-  });
-
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
-  const canPostJob = ['recruiter', 'tpo', 'admin'].includes(user?.role);
-  const canApply = user?.role === 'student';
-
-  const loadData = async () => {
+  const loadJobs = async () => {
     try {
-      const jobsResponse = await api.get('/jobs');
-      const companiesResponse = await api.get('/companies');
-
-      setJobs(jobsResponse.data.jobs);
-      setCompanies(companiesResponse.data.companies);
+      const response = await api.get('/jobs');
+      setJobs(response.data.jobs || []);
+      setError('');
     } catch (err) {
       setError(err.response?.data?.message || 'Could not load jobs');
     }
   };
 
   useEffect(() => {
-    loadData();
+    loadJobs();
   }, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (event) => {
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value,
+    });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage('');
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
+    setMessage('');
 
     try {
       await api.post('/jobs', form);
+      setForm(initialJob);
       setMessage('Job posted successfully');
-      loadData();
+      loadJobs();
     } catch (err) {
       setError(err.response?.data?.message || 'Could not post job');
     }
   };
 
-  const handleApply = async (jobId) => {
-    setMessage('');
-    setError('');
+  const demoJobs = [
+    { title: 'Frontend Developer', companyName: 'TCS', location: 'Bangalore', salaryPackage: '6 LPA', skillsRequired: 'React, JavaScript' },
+    { title: 'MERN Stack Intern', companyName: 'Infosys', location: 'Pune', salaryPackage: '25K/month', skillsRequired: 'Node.js, MongoDB' },
+    { title: 'Cloud Support Associate', companyName: 'Amazon', location: 'Hyderabad', salaryPackage: '8 LPA', skillsRequired: 'Linux, Networking' },
+  ];
 
-    try {
-      const { data } = await api.post('/applications', { jobId });
-      setMessage(data.message);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not apply for this job');
-    }
-  };
+  const list = jobs.length ? jobs : demoJobs;
 
   return (
-    <div className="modulePage">
-      <h2>Jobs</h2>
+    <div className="pageBlock">
+      <div className="pageHeader">
+        <div>
+          <p className="eyebrow">Open Opportunities</p>
+          <h2>Jobs</h2>
+        </div>
+      </div>
 
-      {canPostJob && (
-        <form className="moduleForm" onSubmit={handleSubmit}>
-          <input name="title" placeholder="Job Title" value={form.title} onChange={handleChange} required />
+      <form className="panel formPanel" onSubmit={handleSubmit}>
+        <input name="title" value={form.title} onChange={handleChange} placeholder="Job Title" required />
+        <input name="companyName" value={form.companyName} onChange={handleChange} placeholder="Company Name" required />
+        <input name="location" value={form.location} onChange={handleChange} placeholder="Location" />
+        <input name="salaryPackage" value={form.salaryPackage} onChange={handleChange} placeholder="Package: 6 LPA" />
+        <select name="jobType" value={form.jobType} onChange={handleChange}>
+          <option>Full Time</option>
+          <option>Internship</option>
+          <option>Contract</option>
+        </select>
+        <input name="skillsRequired" value={form.skillsRequired} onChange={handleChange} placeholder="Skills: React, Node.js" />
+        <input name="minimumCgpa" value={form.minimumCgpa} onChange={handleChange} placeholder="Minimum CGPA" />
+        <input name="passingYear" value={form.passingYear} onChange={handleChange} placeholder="Passing Year" />
+        <input name="eligibleBranches" value={form.eligibleBranches} onChange={handleChange} placeholder="Branches: CSE, IT" />
+        <input name="maxActiveBacklogs" value={form.maxActiveBacklogs} onChange={handleChange} placeholder="Max Active Backlogs" />
+        <input name="deadline" value={form.deadline} onChange={handleChange} type="date" />
+        <input name="description" value={form.description} onChange={handleChange} placeholder="Job Description" />
 
-          <select name="company" value={form.company} onChange={handleChange} required>
-            <option value="">Select Company</option>
-            {companies.map((company) => (
-              <option value={company._id} key={company._id}>
-                {company.name}
-              </option>
-            ))}
-          </select>
+        {message && <p className="successText">{message}</p>}
+        {error && <p className="softWarning">{error}. Showing demo jobs.</p>}
 
-          <input name="package" placeholder="Package: 8 LPA" value={form.package} onChange={handleChange} />
-          <input name="location" placeholder="Location" value={form.location} onChange={handleChange} />
-          <input name="experience" placeholder="Experience" value={form.experience} onChange={handleChange} />
+        <button className="primaryButton" type="submit">Post Job</button>
+      </form>
 
-          <select name="jobType" value={form.jobType} onChange={handleChange}>
-            <option value="full_time">Full Time</option>
-            <option value="internship">Internship</option>
-            <option value="ppo">PPO</option>
-            <option value="remote">Remote</option>
-            <option value="hybrid">Hybrid</option>
-          </select>
-
-          <input name="skillsRequired" placeholder="Skills: React, Node.js" value={form.skillsRequired} onChange={handleChange} />
-          <input name="minimumCGPA" placeholder="Minimum CGPA" value={form.minimumCGPA} onChange={handleChange} />
-          <input name="passingYear" placeholder="Passing Year" value={form.passingYear} onChange={handleChange} />
-          <input name="branches" placeholder="Branches: CSE, IT" value={form.branches} onChange={handleChange} />
-          <input name="maxActiveBacklogs" placeholder="Max Active Backlogs" value={form.maxActiveBacklogs} onChange={handleChange} />
-          <input name="deadline" type="date" value={form.deadline} onChange={handleChange} />
-          <input name="description" placeholder="Job Description" value={form.description} onChange={handleChange} />
-
-          <button className="primaryButton" type="submit">Post Job</button>
-        </form>
-      )}
-
-      {message && <p className="successText">{message}</p>}
-      {error && <p className="errorText">{error}</p>}
-
-      <section className="listGrid">
-        {jobs.map((job) => (
-          <article className="listCard" key={job._id}>
+      <div className="cardGrid">
+        {list.map((job, index) => (
+          <div className="miniCard jobCard" key={job._id || index}>
             <h3>{job.title}</h3>
-            <p>{job.company?.name}</p>
-            <p>{job.package || 'Package not added'}</p>
-            <p>{job.location || 'Location not added'}</p>
-            <p>Skills: {job.skillsRequired?.join(', ') || 'Not added'}</p>
-            <p>Minimum CGPA: {job.eligibility?.minimumCGPA || 'Not added'}</p>
-
-            {canApply && (
-              <button className="primaryButton" type="button" onClick={() => handleApply(job._id)}>
-                Apply
-              </button>
-            )}
-          </article>
+            <p>{job.company?.name || job.companyName}</p>
+            <span>{job.location || 'Remote / Campus'}</span>
+            <small>{job.salaryPackage || 'Package not added'}</small>
+            <div className="skillLine">{job.skillsRequired || 'Skills not added'}</div>
+          </div>
         ))}
-      </section>
+      </div>
     </div>
   );
 }

@@ -1,86 +1,41 @@
-import { useEffect, useState } from 'react';
-import api from '../utils/api';
-import { getCurrentUser } from '../utils/auth';
-
 function Applications() {
-  const user = getCurrentUser();
-  const [applications, setApplications] = useState([]);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-
-  const isStudent = user?.role === 'student';
-  const canManage = ['recruiter', 'tpo', 'admin'].includes(user?.role);
-
-  const loadApplications = async () => {
-    try {
-      const endpoint = isStudent ? '/applications/my' : '/applications';
-      const { data } = await api.get(endpoint);
-      setApplications(data.applications);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not load applications');
-    }
-  };
-
-  useEffect(() => {
-    loadApplications();
-  }, []);
-
-  const updateStatus = async (applicationId, status) => {
-    setMessage('');
-    setError('');
-
-    try {
-      await api.patch(`/applications/${applicationId}/status`, { status });
-      setMessage('Application status updated');
-      loadApplications();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not update status');
-    }
-  };
+  const applications = [
+    { student: 'Student Test', job: 'Frontend Developer', company: 'TCS', status: 'Applied' },
+    { student: 'Rahul Sharma', job: 'MERN Stack Intern', company: 'Infosys', status: 'Shortlisted' },
+    { student: 'Priya Verma', job: 'Cloud Support Associate', company: 'Amazon', status: 'Interview' },
+  ];
 
   return (
-    <div className="modulePage">
-      <h2>Applications</h2>
+    <div className="pageBlock">
+      <div className="pageHeader">
+        <div>
+          <p className="eyebrow">Application Tracking</p>
+          <h2>Applications</h2>
+        </div>
+      </div>
 
-      {message && <p className="successText">{message}</p>}
-      {error && <p className="errorText">{error}</p>}
-
-      <section className="listGrid">
-        {applications.map((application) => (
-          <article className="listCard" key={application._id}>
-            <h3>{application.job?.title}</h3>
-            <p>Company: {application.company?.name}</p>
-            <p>Status: {application.status}</p>
-            <p>
-              Eligibility:{' '}
-              {application.eligibilityResult?.isEligible ? 'Eligible' : 'Not Eligible'}
-            </p>
-
-            {application.eligibilityResult?.reasons?.length > 0 && (
-              <p>Reason: {application.eligibilityResult.reasons.join(', ')}</p>
-            )}
-
-            {application.student?.user && (
-              <p>Student: {application.student.user.name}</p>
-            )}
-
-            {canManage && (
-              <select
-                value={application.status}
-                onChange={(e) => updateStatus(application._id, e.target.value)}
-              >
-                <option value="applied">Applied</option>
-                <option value="shortlisted">Shortlisted</option>
-                <option value="assessment">Assessment</option>
-                <option value="interview">Interview</option>
-                <option value="selected">Selected</option>
-                <option value="rejected">Rejected</option>
-                <option value="placed">Placed</option>
-              </select>
-            )}
-          </article>
-        ))}
-      </section>
+      <div className="tableCard">
+        <table className="dataTable">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Job</th>
+              <th>Company</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {applications.map((application, index) => (
+              <tr key={index}>
+                <td>{application.student}</td>
+                <td>{application.job}</td>
+                <td>{application.company}</td>
+                <td><span className="statusBadge">{application.status}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

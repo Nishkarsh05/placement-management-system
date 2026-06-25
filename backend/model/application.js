@@ -4,7 +4,7 @@ const applicationSchema = new mongoose.Schema(
   {
     student: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Student',
+      ref: 'User',
       required: true,
     },
     job: {
@@ -12,25 +12,12 @@ const applicationSchema = new mongoose.Schema(
       ref: 'Job',
       required: true,
     },
-    company: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
-      required: true,
-    },
-    resumeUrl: String,
-    eligibilityResult: {
-      isEligible: {
-        type: Boolean,
-        default: false,
-      },
-      reasons: [String],
-    },
     status: {
       type: String,
-      enum: ['applied', 'shortlisted', 'assessment', 'interview', 'selected', 'rejected', 'placed'],
+      enum: ['applied', 'shortlisted', 'interview', 'selected', 'rejected'],
       default: 'applied',
     },
-    notes: String,
+    coverNote: String,
   },
   { timestamps: true }
 );

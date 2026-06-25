@@ -1,10 +1,13 @@
 const express = require('express');
-const { createCompany, getCompanies } = require('../controller/companycontroller');
-const { protect, allowRoles } = require('../middleware/authmiddleware');
+const {
+  getCompanies,
+  createCompany,
+} = require('../controller/companycontroller');
+const { protect } = require('../middleware/authmiddleware');
 
 const router = express.Router();
 
 router.get('/', protect, getCompanies);
-router.post('/', protect, allowRoles('recruiter', 'tpo', 'admin'), createCompany);
+router.post('/', protect, createCompany);
 
 module.exports = router;

@@ -1,29 +1,30 @@
 import { useEffect, useState } from 'react';
 import api from '../utils/api';
 
-function Companies() {
-  const [companies, setCompanies] = useState([]);
-  const [form, setForm] = useState({
-    name: '',
-    industry: '',
-    website: '',
-    location: '',
-    description: '',
-    hrName: '',
-    hrEmail: '',
-    hrPhone: '',
-  });
+const initialCompany = {
+  name: '',
+  industry: '',
+  website: '',
+  location: '',
+  description: '',
+  hrName: '',
+  hrEmail: '',
+  hrPhone: '',
+};
 
-  const [message, setMessage] = useState('');
+function Companies() {
+  const [form, setForm] = useState(initialCompany);
+  const [companies, setCompanies] = useState([]);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const loadCompanies = async () => {
     try {
-      const { data } = await api.get('/companies');
-      setCompanies(data.companies);
+      const response = await api.get('/companies');
+      setCompanies(response.data.companies || []);
+      setError('');
     } catch (err) {
-      console.log(err.response?.data || err.message);
-      setError(err.response?.data?.message || err.message || 'Could not add company');
+      setError(err.response?.data?.message || 'Could not load companies');
     }
   };
 
@@ -31,75 +32,71 @@ function Companies() {
     loadCompanies();
   }, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (event) => {
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value,
+    });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage('');
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
+    setMessage('');
 
     try {
-      await api.post('/companies', {
-        name: form.name,
-        industry: form.industry,
-        website: form.website,
-        location: form.location,
-        description: form.description,
-        hrContact: {
-          name: form.hrName,
-          email: form.hrEmail,
-          phone: form.hrPhone,
-        },
-      });
-
+      await api.post('/companies', form);
+      setForm(initialCompany);
       setMessage('Company added successfully');
-      setForm({
-        name: '',
-        industry: '',
-        website: '',
-        location: '',
-        description: '',
-        hrName: '',
-        hrEmail: '',
-        hrPhone: '',
-      });
       loadCompanies();
     } catch (err) {
       setError(err.response?.data?.message || 'Could not add company');
     }
   };
 
-  return (
-    <div className="modulePage">
-      <h2>Companies</h2>
+  const demoCompanies = [
+    { name: 'TCS', industry: 'IT Services', location: 'Bangalore', hrEmail: 'hr@tcs.com' },
+    { name: 'Infosys', industry: 'Technology', location: 'Pune', hrEmail: 'hr@infosys.com' },
+    { name: 'Amazon', industry: 'Cloud and Ecommerce', location: 'Hyderabad', hrEmail: 'campus@amazon.com' },
+  ];
 
-      <form className="moduleForm" onSubmit={handleSubmit}>
-        <input name="name" placeholder="Company Name" value={form.name} onChange={handleChange} required />
-        <input name="industry" placeholder="Industry" value={form.industry} onChange={handleChange} />
-        <input name="website" placeholder="Website" value={form.website} onChange={handleChange} />
-        <input name="location" placeholder="Location" value={form.location} onChange={handleChange} />
-        <input name="description" placeholder="Description" value={form.description} onChange={handleChange} />
-        <input name="hrName" placeholder="HR Name" value={form.hrName} onChange={handleChange} />
-        <input name="hrEmail" placeholder="HR Email" value={form.hrEmail} onChange={handleChange} />
-        <input name="hrPhone" placeholder="HR Phone" value={form.hrPhone} onChange={handleChange} />
+  const list = companies.length ? companies : demoCompanies;
+
+  return (
+    <div className="pageBlock">
+      <div className="pageHeader">
+        <div>
+          <p className="eyebrow">Recruiting Partners</p>
+          <h2>Companies</h2>
+        </div>
+      </div>
+
+      <form className="panel formPanel" onSubmit={handleSubmit}>
+        <input name="name" value={form.name} onChange={handleChange} placeholder="Company Name" required />
+        <input name="industry" value={form.industry} onChange={handleChange} placeholder="Industry" />
+        <input name="website" value={form.website} onChange={handleChange} placeholder="Website" />
+        <input name="location" value={form.location} onChange={handleChange} placeholder="Location" />
+        <input name="description" value={form.description} onChange={handleChange} placeholder="Description" />
+        <input name="hrName" value={form.hrName} onChange={handleChange} placeholder="HR Name" />
+        <input name="hrEmail" value={form.hrEmail} onChange={handleChange} placeholder="HR Email" />
+        <input name="hrPhone" value={form.hrPhone} onChange={handleChange} placeholder="HR Phone" />
 
         {message && <p className="successText">{message}</p>}
-        {error && <p className="errorText">{error}</p>}
+        {error && <p className="softWarning">{error}. Showing demo data if available.</p>}
 
         <button className="primaryButton" type="submit">Add Company</button>
       </form>
 
-      <section className="listGrid">
-        {companies.map((company) => (
-          <article className="listCard" key={company._id}>
+      <div className="cardGrid">
+        {list.map((company, index) => (
+          <div className="miniCard" key={company._id || index}>
             <h3>{company.name}</h3>
-            <p>{company.industry || 'Industry not added'}</p>
-            <p>{company.location || 'Location not added'}</p>
-          </article>
+            <p>{company.industry || 'Technology'}</p>
+            <span>{company.location || 'Campus hiring'}</span>
+            <small>{company.hrEmail || 'No HR email added'}</small>
+          </div>
         ))}
-      </section>
+      </div>
     </div>
   );
 }

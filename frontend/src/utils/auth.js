@@ -32,12 +32,7 @@ export const getCurrentUser = () => {
   return getUser();
 };
 
-export const getDashboardPath = (role) => {
-  if (role === 'student') return '/dashboard';
-  if (role === 'recruiter') return '/dashboard';
-  if (role === 'tpo') return '/dashboard';
-  if (role === 'admin') return '/dashboard';
-
+export const getDashboardPath = () => {
   return '/dashboard';
 };
 

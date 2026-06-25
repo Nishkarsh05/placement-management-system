@@ -7,41 +7,19 @@ const interviewSchema = new mongoose.Schema(
       ref: 'Application',
       required: true,
     },
-    student: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Student',
-      required: true,
-    },
-    job: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Job',
-      required: true,
-    },
-    company: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
-      required: true,
-    },
-    type: {
+    roundName: String,
+    interviewDate: Date,
+    mode: {
       type: String,
-      enum: ['hr', 'technical', 'managerial', 'final'],
-      default: 'technical',
+      enum: ['online', 'offline'],
+      default: 'online',
     },
-    scheduledAt: {
-      type: Date,
-      required: true,
-    },
-    interviewer: String,
     meetingLink: String,
+    venue: String,
     status: {
       type: String,
       enum: ['scheduled', 'completed', 'cancelled'],
       default: 'scheduled',
-    },
-    result: {
-      type: String,
-      enum: ['pending', 'selected', 'rejected'],
-      default: 'pending',
     },
     feedback: String,
   },

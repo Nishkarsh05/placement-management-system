@@ -6,7 +6,9 @@ const protect = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: 'Not authorized, token missing' });
+      return res.status(401).json({
+        message: 'Not authorized, token missing',
+      });
     }
 
     const token = authHeader.split(' ')[1];
@@ -19,13 +21,17 @@ const protect = async (req, res, next) => {
     const user = await User.findById(decoded.id);
 
     if (!user || !user.isActive) {
-      return res.status(401).json({ message: 'Not authorized, user not found' });
+      return res.status(401).json({
+        message: 'Not authorized, user not found',
+      });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Not authorized, token failed' });
+    res.status(401).json({
+      message: 'Not authorized, token failed',
+    });
   }
 };
 

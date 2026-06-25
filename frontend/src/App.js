@@ -5,13 +5,14 @@ import Dashboard from './pages/dashboard';
 import Login from './pages/login';
 import Register from './pages/register';
 import NotFound from './pages/notfound';
-
 import Profile from './pages/profile';
 import Students from './pages/students';
 import Companies from './pages/companies';
 import Jobs from './pages/jobs';
 import Applications from './pages/applications';
+import Reports from './pages/reports';
 import AiInsights from './pages/aiinsights';
+import Chat from './pages/chat';
 
 import ProtectedRoute from './routes/protectedroute';
 import './App.css';
@@ -38,7 +39,9 @@ function App() {
         <Route path="/companies" element={<Companies />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/applications" element={<Applications />} />
+        <Route path="/reports" element={<Reports />} />
         <Route path="/ai-insights" element={<AiInsights />} />
+        <Route path="/chat" element={<Chat />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
