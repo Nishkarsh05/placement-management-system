@@ -52,9 +52,7 @@ const sendMessage = async (req, res) => {
     const receiverExists = await User.findById(receiver);
 
     if (!receiverExists) {
-      return res.status(404).json({
-        message: 'Receiver not found',
-      });
+      return res.status(404).json({ message: 'Receiver not found' });
     }
 
     const newMessage = await Message.create({
@@ -63,13 +61,13 @@ const sendMessage = async (req, res) => {
       message,
     });
 
-    const populatedMessage = await Message.findById(newMessage._id)
+    const chatMessage = await Message.findById(newMessage._id)
       .populate('sender', 'name email role')
       .populate('receiver', 'name email role');
 
     res.status(201).json({
       message: 'Message sent successfully',
-      chatMessage: populatedMessage,
+      chatMessage,
     });
   } catch (error) {
     res.status(500).json({

@@ -1,7 +1,7 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "Placement Management System API",
+  "name": "placement-management-backend",
+  "version": "2.0.0",
+  "description": "Placement Management System Backend",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -9,7 +9,7 @@
     "seed": "node seeddemo.js"
   },
   "dependencies": {
-    "@google/genai": "^2.10.0",
+    "@google/genai": "^1.0.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

@@ -1,72 +1,100 @@
 const Application = require('../model/application');
-const Job = require('../model/job');
 
 const getApplications = async (req, res) => {
-  try {
-    const filter = req.user.role === 'student' ? { student: req.user._id } : {};
+  const query = {};
 
-    const applications = await Application.find(filter)
-      .populate('student', 'name email department')
-      .populate('job')
-      .sort({ createdAt: -1 });
-
-    res.json({ applications });
-  } catch (error) {
-    res.status(500).json({
-      message: 'Could not load applications',
-      error: error.message,
-    });
+  if (req.user.role === 'student') {
+    query.student = req.user._id;
   }
+
+  const applications = await Application.find(query)
+    .populate('student', 'name email phone department')
+    .populate('job', 'title location jobType skills minCgpa branches')
+    .populate('company', 'name industry location website hrName hrEmail');
+
+  res.json({ applications });
 };
 
 const createApplication = async (req, res) => {
-  try {
-    const { jobId, coverNote } = req.body;
+  const { job, company } = req.body;
 
-    if (!jobId) {
-      return res.status(400).json({
-        message: 'Job id is required',
-      });
-    }
+  const existing = await Application.findOne({
+    student: req.user._id,
+    job,
+  });
 
-    const job = await Job.findById(jobId);
+  if (existing) {
+    return res.status(409).json({ message: 'You already applied for this job' });
+  }
 
-    if (!job) {
-      return res.status(404).json({
-        message: 'Job not found',
-      });
-    }
+  const application = await Application.create({
+    student: req.user._id,
+    job,
+    company,
+  });
 
-    const existingApplication = await Application.findOne({
-      student: req.user._id,
-      job: jobId,
-    });
+  res.status(201).json({ application });
+};
 
-    if (existingApplication) {
-      return res.status(409).json({
-        message: 'You already applied for this job',
-      });
-    }
+const updateApplicationStatus = async (req, res) => {
+  const { status, recruiterNote, interviewDate } = req.body;
 
-    const application = await Application.create({
-      student: req.user._id,
-      job: jobId,
-      coverNote,
-    });
+  const application = await Application.findByIdAndUpdate(
+    req.params.id,
+    {
+      ...(status ? { status } : {}),
+      ...(recruiterNote !== undefined ? { recruiterNote } : {}),
+      ...(interviewDate ? { interviewDate } : {}),
+    },
+    { new: true }
+  )
+    .populate('student', 'name email phone department')
+    .populate('job', 'title location jobType')
+    .populate('company', 'name industry location');
 
-    res.status(201).json({
-      message: 'Application submitted successfully',
-      application,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: 'Could not submit application',
-      error: error.message,
+  if (!application) {
+    return res.status(404).json({ message: 'Application not found' });
+  }
+
+  res.json({ application });
+};
+
+const updateCandidateDecision = async (req, res) => {
+  const { decisionStatus } = req.body;
+
+  const allowed = ['New', 'Reviewed', 'Shortlisted', 'Interview', 'Selected', 'Rejected'];
+  if (!allowed.includes(decisionStatus)) {
+    return res.status(400).json({ message: 'Invalid decision status' });
+  }
+
+  const statusMap = {
+    New: 'Applied',
+    Reviewed: 'Reviewed',
+    Shortlisted: 'Shortlisted',
+    Interview: 'Interview',
+    Selected: 'Selected',
+    Rejected: 'Rejected',
+  };
+
+  const application = await Application.findOneAndUpdate(
+    { student: req.params.candidateId },
+    { status: statusMap[decisionStatus] },
+    { new: true }
+  );
+
+  if (!application) {
+    return res.json({
+      message: 'No application found for this candidate yet. Frontend demo decision can still show.',
+      decisionStatus,
     });
   }
+
+  res.json({ application, decisionStatus });
 };
 
 module.exports = {
   getApplications,
   createApplication,
+  updateApplicationStatus,
+  updateCandidateDecision,
 };

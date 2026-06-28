@@ -1,33 +1,32 @@
-import axios from 'axios';
+import { getToken } from './auth';
 
-const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
-});
+const API_BASE_URL = 'http://localhost:5000/api';
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+const getHeaders = () => {
+  const token = getToken();
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
+export const apiRequest = async (path, options = {}) => {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      ...getHeaders(),
+      ...(options.headers || {}),
+    },
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Request failed');
   }
 
-  return config;
-});
+  return data;
+};
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
-
-export default api;
+export default API_BASE_URL;

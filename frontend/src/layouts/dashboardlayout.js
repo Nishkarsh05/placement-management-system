@@ -9,9 +9,10 @@ function DashboardLayout() {
 
       <main className="mainArea">
         <Navbar />
-        <section className="pageContent">
+
+        <div className="contentArea">
           <Outlet />
-        </section>
+        </div>
       </main>
     </div>
   );

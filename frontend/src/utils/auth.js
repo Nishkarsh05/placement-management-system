@@ -1,42 +1,33 @@
 export const saveAuth = (token, user) => {
-  if (token) {
-    localStorage.setItem('token', token);
-  }
-
-  if (user) {
-    localStorage.setItem('user', JSON.stringify(user));
-  }
+  localStorage.setItem('token', token);
+  localStorage.setItem('user', JSON.stringify(user));
 };
 
-export const getToken = () => {
-  return localStorage.getItem('token');
-};
+export const getToken = () => localStorage.getItem('token');
 
 export const getUser = () => {
-  const user = localStorage.getItem('user');
-
-  if (!user || user === 'undefined' || user === 'null') {
-    localStorage.removeItem('user');
-    return null;
-  }
-
   try {
-    return JSON.parse(user);
-  } catch (error) {
+    const saved = localStorage.getItem('user');
+    if (!saved || saved === 'undefined') return null;
+    return JSON.parse(saved);
+  } catch {
     localStorage.removeItem('user');
     return null;
   }
 };
 
-export const getCurrentUser = () => {
-  return getUser();
-};
-
-export const getDashboardPath = () => {
-  return '/dashboard';
-};
+export const getCurrentUser = () => getUser();
 
 export const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+};
+
+export const getDashboardPath = (role) => {
+  const cleanRole = String(role || '').toLowerCase();
+
+  if (cleanRole === 'recruiter') return '/recruiter/dashboard';
+  if (cleanRole === 'tpo') return '/tpo/dashboard';
+  if (cleanRole === 'admin') return '/admin/dashboard';
+  return '/student/dashboard';
 };

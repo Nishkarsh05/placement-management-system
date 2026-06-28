@@ -12,16 +12,24 @@ const applicationSchema = new mongoose.Schema(
       ref: 'Job',
       required: true,
     },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+    },
     status: {
       type: String,
-      enum: ['applied', 'shortlisted', 'interview', 'selected', 'rejected'],
-      default: 'applied',
+      enum: ['Applied', 'Reviewed', 'Shortlisted', 'Interview', 'Selected', 'Rejected'],
+      default: 'Applied',
     },
-    coverNote: String,
+    recruiterNote: {
+      type: String,
+      trim: true,
+    },
+    interviewDate: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );
-
-applicationSchema.index({ student: 1, job: 1 }, { unique: true });
 
 module.exports = mongoose.model('Application', applicationSchema);

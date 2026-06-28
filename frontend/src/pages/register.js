@@ -1,16 +1,18 @@
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
-import { saveAuth } from '../utils/auth';
+import { getDashboardPath, saveAuth } from '../utils/auth';
 
 function Register() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const selectedRole = searchParams.get('role') || 'student';
 
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
-    role: 'student',
+    role: selectedRole,
     department: '',
     password: '',
   });
@@ -32,20 +34,10 @@ function Register() {
 
     try {
       const response = await api.post('/auth/register', form);
-
-      console.log('Register response:', response.data);
-
       saveAuth(response.data.token, response.data.user);
-      navigate('/dashboard');
+      navigate(getDashboardPath(response.data.user.role));
     } catch (err) {
-      console.log('Register error:', err.response?.data || err.message);
-
-      setError(
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        'Registration failed. Please try again.'
-      );
+      setError(err.response?.data?.message || err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -54,38 +46,23 @@ function Register() {
   return (
     <main className="authPage">
       <form className="authCard wideAuthCard" onSubmit={handleSubmit}>
-        <p className="eyebrow">Create Account</p>
-        <h1>Register for placement access</h1>
+        <p className="caption">Create Account</p>
+        <h1>Register as {form.role}</h1>
 
         <div className="formGrid">
           <div>
             <label>Name</label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
+            <input name="name" value={form.name} onChange={handleChange} required />
           </div>
 
           <div>
             <label>Email</label>
-            <input
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              type="email"
-              required
-            />
+            <input name="email" value={form.email} onChange={handleChange} type="email" required />
           </div>
 
           <div>
             <label>Phone</label>
-            <input
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-            />
+            <input name="phone" value={form.phone} onChange={handleChange} />
           </div>
 
           <div>
@@ -100,22 +77,12 @@ function Register() {
 
           <div>
             <label>Department</label>
-            <input
-              name="department"
-              value={form.department}
-              onChange={handleChange}
-            />
+            <input name="department" value={form.department} onChange={handleChange} />
           </div>
 
           <div>
             <label>Password</label>
-            <input
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              type="password"
-              required
-            />
+            <input name="password" value={form.password} onChange={handleChange} type="password" required />
           </div>
         </div>
 
@@ -126,7 +93,7 @@ function Register() {
         </button>
 
         <p className="authSwitch">
-          Already registered? <Link to="/login">Login</Link>
+          Already registered? <Link to="/login">Choose login portal</Link>
         </p>
       </form>
     </main>

@@ -9,23 +9,19 @@ const createToken = (userId) => {
   );
 };
 
-const cleanUser = (user) => {
-  return {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    role: user.role,
-    department: user.department,
-  };
-};
+const cleanUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  phone: user.phone,
+  role: user.role,
+  department: user.department,
+});
 
 const sendUserResponse = (res, user, statusCode) => {
-  const token = createToken(user._id);
-
   res.status(statusCode).json({
     message: 'Success',
-    token,
+    token: createToken(user._id),
     user: cleanUser(user),
   });
 };
@@ -88,17 +84,13 @@ const login = async (req, res) => {
     }).select('+password');
 
     if (!user) {
-      return res.status(401).json({
-        message: 'Invalid email or password',
-      });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const passwordMatches = await user.comparePassword(password);
 
     if (!passwordMatches) {
-      return res.status(401).json({
-        message: 'Invalid email or password',
-      });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     sendUserResponse(res, user, 200);

@@ -1,173 +1,173 @@
 import { useEffect, useState } from 'react';
-import api from '../utils/api';
-import { getCurrentUser } from '../utils/auth';
+import { apiRequest } from '../utils/api';
+import { getUser } from '../utils/auth';
+
+const demoPeople = [
+  {
+    _id: 'demo-student',
+    name: 'Student Demo',
+    role: 'student',
+    email: 'student@test.com',
+  },
+  {
+    _id: 'demo-recruiter',
+    name: 'Recruiter Demo',
+    role: 'recruiter',
+    email: 'recruiter@test.com',
+  },
+  {
+    _id: 'demo-tpo',
+    name: 'TPO Coordinator',
+    role: 'tpo',
+    email: 'tpo@test.com',
+  },
+];
+
+const demoMessages = [
+  {
+    _id: 'm1',
+    fromMe: false,
+    text: 'Hello, I reviewed your profile. Your React and Node.js skills look relevant for our frontend role.',
+  },
+  {
+    _id: 'm2',
+    fromMe: true,
+    text: 'Thank you. I have also uploaded my resume and GitHub projects.',
+  },
+  {
+    _id: 'm3',
+    fromMe: false,
+    text: 'Great. Please be ready for a technical round on JavaScript, APIs, and MongoDB basics.',
+  },
+];
 
 function Chat() {
-  const currentUser = getCurrentUser();
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState('');
-  const [suggestion, setSuggestion] = useState('');
-  const [error, setError] = useState('');
-
-  const loadUsers = async () => {
-    try {
-      const response = await api.get('/messages/users');
-      setUsers(response.data.users || []);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not load chat users');
-    }
-  };
-
-  const loadMessages = async (userId) => {
-    try {
-      const response = await api.get(`/messages/${userId}`);
-      setMessages(response.data.messages || []);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not load messages');
-    }
-  };
+  const user = getUser() || {};
+  const [people, setPeople] = useState([]);
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [messages, setMessages] = useState(demoMessages);
+  const [messageText, setMessageText] = useState('');
+  const [notice, setNotice] = useState('');
 
   useEffect(() => {
-    loadUsers();
+    const loadPeople = async () => {
+      try {
+        const data = await apiRequest('/messages/users');
+        const users = data.users || [];
+
+        if (users.length === 0) {
+          setPeople(demoPeople);
+          setSelectedPerson(demoPeople[0]);
+          setNotice('Showing demo chat contacts for presentation.');
+          return;
+        }
+
+        setPeople(users);
+        setSelectedPerson(users[0]);
+        setNotice('');
+      } catch {
+        setPeople(demoPeople);
+        setSelectedPerson(demoPeople[0]);
+        setNotice('Showing demo chat contacts for presentation.');
+      }
+    };
+
+    loadPeople();
   }, []);
 
-  const handleSelectUser = (user) => {
-    setSelectedUser(user);
-    setSuggestion('');
-    loadMessages(user._id);
-  };
-
-  const handleSend = async (event) => {
+  const sendMessage = async (event) => {
     event.preventDefault();
 
-    if (!selectedUser || !message.trim()) return;
+    if (!messageText.trim()) return;
+
+    const newMessage = {
+      _id: Date.now().toString(),
+      fromMe: true,
+      text: messageText.trim(),
+    };
+
+    setMessages((current) => [...current, newMessage]);
+    setMessageText('');
 
     try {
-      const response = await api.post('/messages', {
-        receiver: selectedUser._id,
-        message,
+      await apiRequest('/messages', {
+        method: 'POST',
+        body: JSON.stringify({
+          receiver: selectedPerson?._id,
+          text: newMessage.text,
+        }),
       });
-
-      setMessages([...messages, response.data.chatMessage]);
-      setMessage('');
-      setSuggestion('');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not send message');
+    } catch {
+      setNotice('Message added in demo mode. Backend chat can be connected later.');
     }
-  };
-
-  const handleSuggestReply = async () => {
-    try {
-      const lastMessage = messages[messages.length - 1]?.message || '';
-
-      const response = await api.post('/google-ai/suggest-reply', {
-        role: currentUser?.role,
-        lastMessage,
-        context: selectedUser
-          ? `Chatting with ${selectedUser.name}, role ${selectedUser.role}`
-          : 'No selected user',
-      });
-
-      setSuggestion(response.data.suggestion);
-    } catch (err) {
-      setSuggestion(err.response?.data?.message || 'Could not generate suggestion');
-    }
-  };
-
-  const useSuggestion = () => {
-    setMessage(suggestion);
   };
 
   return (
-    <div className="pageBlock">
-      <div className="pageHeader">
-        <div>
-          <p className="eyebrow">Student Recruiter Communication</p>
-          <h2>Chat</h2>
-        </div>
-      </div>
+    <div className="pageStack">
+      <section className="pageHero">
+        <p className="eyebrow">Student Recruiter Communication</p>
+        <h2>Chat</h2>
+        <p>
+          {user.role === 'recruiter'
+            ? 'Talk with shortlisted students, answer questions, and share interview updates.'
+            : 'Ask recruiters about eligibility, interviews, job details, and application status.'}
+        </p>
+      </section>
 
-      {error && <p className="errorText">{error}</p>}
+      {notice && <div className="softNotice">{notice}</div>}
 
-      <div className="chatLayout">
-        <aside className="chatUsers panel">
-          <h3>People</h3>
-
-          {users.length === 0 && (
-            <p className="mutedText">No users found yet. Register one student and one recruiter.</p>
-          )}
-
-          {users.map((user) => (
-            <button
-              key={user._id}
-              type="button"
-              className={
-                selectedUser?._id === user._id
-                  ? 'chatUser activeChatUser'
-                  : 'chatUser'
-              }
-              onClick={() => handleSelectUser(user)}
-            >
-              <strong>{user.name}</strong>
-              <span>{user.role} · {user.email}</span>
-            </button>
-          ))}
-        </aside>
-
-        <section className="chatWindow panel">
-          {!selectedUser ? (
-            <div className="emptyChat">
-              <h3>Select a person to start chatting</h3>
-              <p>Students can ask recruiters about jobs, eligibility, interviews, and application status.</p>
+      <section className="chatLayout">
+        <div className="surface">
+          <div className="sectionHeader">
+            <div>
+              <p className="eyebrow">People</p>
+              <h3>Contacts</h3>
             </div>
-          ) : (
+          </div>
+
+          <div className="peopleList">
+            {people.map((person) => (
+              <button
+                key={person._id}
+                type="button"
+                className={`personButton ${selectedPerson?._id === person._id ? 'active' : ''}`}
+                onClick={() => setSelectedPerson(person)}
+              >
+                <strong>{person.name}</strong>
+                <span>{person.role}</span>
+                <small>{person.email}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="surface chatBox">
+          {selectedPerson ? (
             <>
-              <div className="chatHeader">
+              <div className="sectionHeader">
                 <div>
-                  <h3>{selectedUser.name}</h3>
-                  <p>{selectedUser.role} · {selectedUser.email}</p>
+                  <p className="eyebrow">{selectedPerson.role}</p>
+                  <h3>{selectedPerson.name}</h3>
                 </div>
-
-                <button className="secondaryButton" type="button" onClick={handleSuggestReply}>
-                  AI Suggest Reply
-                </button>
+                <span className="countPill">Online</span>
               </div>
 
-              <div className="messageList">
-                {messages.length === 0 && (
-                  <p className="mutedText">No messages yet. Send the first message.</p>
-                )}
-
-                {messages.map((chatMessage) => {
-                  const isMine = chatMessage.sender?._id === currentUser?.id;
-
-                  return (
-                    <div
-                      key={chatMessage._id}
-                      className={isMine ? 'messageBubble myMessage' : 'messageBubble theirMessage'}
-                    >
-                      <p>{chatMessage.message}</p>
-                      <span>{chatMessage.sender?.name}</span>
-                    </div>
-                  );
-                })}
+              <div className="messages">
+                {messages.map((message) => (
+                  <div
+                    key={message._id}
+                    className={`messageBubble ${message.fromMe ? 'me' : ''}`}
+                  >
+                    {message.text}
+                  </div>
+                ))}
               </div>
 
-              {suggestion && (
-                <div className="aiSuggestion">
-                  <p>{suggestion}</p>
-                  <button type="button" onClick={useSuggestion}>
-                    Use this reply
-                  </button>
-                </div>
-              )}
-
-              <form className="chatForm" onSubmit={handleSend}>
+              <form className="chatInputRow" onSubmit={sendMessage}>
                 <input
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
+                  className="formInput"
+                  value={messageText}
+                  onChange={(event) => setMessageText(event.target.value)}
                   placeholder="Type your message"
                 />
                 <button className="primaryButton" type="submit">
@@ -175,9 +175,14 @@ function Chat() {
                 </button>
               </form>
             </>
+          ) : (
+            <div className="emptyState">
+              <h3>Select a person to start chatting</h3>
+              <p>Students and recruiters can communicate about interviews and applications.</p>
+            </div>
           )}
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

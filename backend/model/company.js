@@ -14,6 +14,7 @@ const companySchema = new mongoose.Schema(
     hrName: String,
     hrEmail: String,
     hrPhone: String,
+    logoText: String,
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

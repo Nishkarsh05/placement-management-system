@@ -1,8 +1,5 @@
 const express = require('express');
-const {
-  getCompanies,
-  createCompany,
-} = require('../controller/companycontroller');
+const { getCompanies, createCompany } = require('../controller/companycontroller');
 const { protect } = require('../middleware/authmiddleware');
 
 const router = express.Router();

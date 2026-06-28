@@ -1,15 +1,15 @@
 const express = require('express');
 const {
-  getStudentProfile,
-  saveStudentProfile,
-  getAllStudents,
+  getStudents,
+  getMyProfile,
+  updateMyProfile,
 } = require('../controller/studentcontroller');
-const { protect } = require('../middleware/authmiddleware');
+const { protect, allowRoles } = require('../middleware/authmiddleware');
 
 const router = express.Router();
 
-router.get('/profile', protect, getStudentProfile);
-router.post('/profile', protect, saveStudentProfile);
-router.get('/', protect, getAllStudents);
+router.get('/', protect, allowRoles('recruiter', 'tpo', 'admin'), getStudents);
+router.get('/profile', protect, getMyProfile);
+router.put('/profile', protect, updateMyProfile);
 
 module.exports = router;

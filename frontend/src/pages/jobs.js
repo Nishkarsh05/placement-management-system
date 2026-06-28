@@ -1,115 +1,142 @@
 import { useEffect, useState } from 'react';
-import api from '../utils/api';
+import { apiRequest } from '../utils/api';
+import { getUser } from '../utils/auth';
 
-const initialJob = {
-  title: '',
-  companyName: '',
-  location: '',
-  salaryPackage: '',
-  jobType: 'Full Time',
-  skillsRequired: '',
-  minimumCgpa: '',
-  passingYear: '',
-  eligibleBranches: '',
-  maxActiveBacklogs: '',
-  deadline: '',
-  description: '',
+const emptyJob = {
+  title: '', companyName: '', location: '', package: '', type: 'Full Time', skills: '', minCgpa: '', passingYear: '', branches: '', maxBacklogs: '', deadline: '', description: '',
 };
 
-function Jobs() {
-  const [form, setForm] = useState(initialJob);
-  const [jobs, setJobs] = useState([]);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+const demoJobs = [
+  { _id: 'j1', title: 'Frontend Developer Intern', companyName: 'TCS', location: 'Bangalore', package: '4.5 LPA', type: 'Internship', skills: 'React, JavaScript, CSS', minCgpa: '6.5', deadline: '2026-08-12', description: 'Build frontend modules for business applications.' },
+  { _id: 'j2', title: 'Backend Developer Trainee', companyName: 'Infosys', location: 'Pune', package: '5 LPA', type: 'Full Time', skills: 'Node.js, MongoDB, APIs', minCgpa: '6.0', deadline: '2026-08-18', description: 'Work on APIs and database backed services.' },
+  { _id: 'j3', title: 'Cloud Support Associate', companyName: 'Amazon', location: 'Hyderabad', package: '6 LPA', type: 'Full Time', skills: 'Linux, Networking, Cloud', minCgpa: '7.0', deadline: '2026-08-25', description: 'Support cloud customers and troubleshoot technical issues.' },
+];
 
-  const loadJobs = async () => {
-    try {
-      const response = await api.get('/jobs');
-      setJobs(response.data.jobs || []);
-      setError('');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not load jobs');
-    }
-  };
+function Jobs() {
+  const user = getUser() || {};
+  const role = String(user.role || 'student').toLowerCase();
+  const canPostJob = role === 'recruiter';
+  const isStudent = role === 'student';
+  const isAdmin = role === 'admin';
+  const isTpo = role === 'tpo';
+
+  const [jobs, setJobs] = useState([]);
+  const [form, setForm] = useState(emptyJob);
+  const [notice, setNotice] = useState('');
 
   useEffect(() => {
     loadJobs();
   }, []);
 
-  const handleChange = (event) => {
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
-  };
+  async function loadJobs() {
+    try {
+      const data = await apiRequest('/jobs');
+      const list = Array.isArray(data) ? data : data.jobs;
+      setJobs(Array.isArray(list) && list.length ? list : demoJobs);
+    } catch (error) {
+      setJobs(demoJobs);
+    }
+  }
 
-  const handleSubmit = async (event) => {
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault();
-    setError('');
-    setMessage('');
+
+    if (!canPostJob) {
+      setNotice('Only recruiters can post jobs.');
+      return;
+    }
+
+    const newJob = { ...form, _id: `local-${Date.now()}` };
 
     try {
-      await api.post('/jobs', form);
-      setForm(initialJob);
-      setMessage('Job posted successfully');
-      loadJobs();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not post job');
+      const saved = await apiRequest('/jobs', { method: 'POST', body: JSON.stringify(form) });
+      setJobs((current) => [saved.job || saved, ...current]);
+      setNotice('Job posted successfully.');
+    } catch (error) {
+      setJobs((current) => [newJob, ...current]);
+      setNotice('Job saved locally.');
     }
-  };
 
-  const demoJobs = [
-    { title: 'Frontend Developer', companyName: 'TCS', location: 'Bangalore', salaryPackage: '6 LPA', skillsRequired: 'React, JavaScript' },
-    { title: 'MERN Stack Intern', companyName: 'Infosys', location: 'Pune', salaryPackage: '25K/month', skillsRequired: 'Node.js, MongoDB' },
-    { title: 'Cloud Support Associate', companyName: 'Amazon', location: 'Hyderabad', salaryPackage: '8 LPA', skillsRequired: 'Linux, Networking' },
-  ];
+    setForm(emptyJob);
+  }
 
-  const list = jobs.length ? jobs : demoJobs;
+  function applyForJob(job) {
+    const application = {
+      id: `app-${Date.now()}`,
+      studentName: user.name || 'Student Demo',
+      email: user.email || 'student@test.com',
+      role: job.title,
+      company: job.companyName || 'Company not assigned',
+      appliedDate: new Date().toLocaleDateString(),
+      status: 'Applied',
+      interviewDate: '',
+      message: 'Your request has been submitted and is waiting for recruiter review.',
+    };
+
+    const current = JSON.parse(localStorage.getItem('studentApplications') || '[]');
+    localStorage.setItem('studentApplications', JSON.stringify([application, ...current]));
+    setNotice('Request applied.');
+  }
 
   return (
-    <div className="pageBlock">
-      <div className="pageHeader">
+    <div className="pageStack">
+      <section className="pageHero">
         <div>
-          <p className="eyebrow">Open Opportunities</p>
-          <h2>Jobs</h2>
+          <p className="eyebrow">{canPostJob ? 'Recruiter Jobs' : isStudent ? 'Student Opportunities' : 'Job Records'}</p>
+          <h1>{canPostJob ? 'Post and Manage Jobs' : isStudent ? 'Available Jobs' : 'Job Posting Log'}</h1>
+          <p>{canPostJob ? 'Create hiring roles for students.' : isStudent ? 'Browse open roles and apply.' : 'View all job postings. Admin and TPO do not create recruiter jobs.'}</p>
         </div>
-      </div>
+      </section>
 
-      <form className="panel formPanel" onSubmit={handleSubmit}>
-        <input name="title" value={form.title} onChange={handleChange} placeholder="Job Title" required />
-        <input name="companyName" value={form.companyName} onChange={handleChange} placeholder="Company Name" required />
-        <input name="location" value={form.location} onChange={handleChange} placeholder="Location" />
-        <input name="salaryPackage" value={form.salaryPackage} onChange={handleChange} placeholder="Package: 6 LPA" />
-        <select name="jobType" value={form.jobType} onChange={handleChange}>
-          <option>Full Time</option>
-          <option>Internship</option>
-          <option>Contract</option>
-        </select>
-        <input name="skillsRequired" value={form.skillsRequired} onChange={handleChange} placeholder="Skills: React, Node.js" />
-        <input name="minimumCgpa" value={form.minimumCgpa} onChange={handleChange} placeholder="Minimum CGPA" />
-        <input name="passingYear" value={form.passingYear} onChange={handleChange} placeholder="Passing Year" />
-        <input name="eligibleBranches" value={form.eligibleBranches} onChange={handleChange} placeholder="Branches: CSE, IT" />
-        <input name="maxActiveBacklogs" value={form.maxActiveBacklogs} onChange={handleChange} placeholder="Max Active Backlogs" />
-        <input name="deadline" value={form.deadline} onChange={handleChange} type="date" />
-        <input name="description" value={form.description} onChange={handleChange} placeholder="Job Description" />
+      {notice && <div className="noticeBox">{notice}</div>}
 
-        {message && <p className="successText">{message}</p>}
-        {error && <p className="softWarning">{error}. Showing demo jobs.</p>}
+      {canPostJob && (
+        <section className="formSurface">
+          <div className="sectionHeader"><div><p className="eyebrow">Job Details</p><h2>Create Hiring Role</h2></div></div>
+          <form className="spaciousForm" onSubmit={handleSubmit}>
+            <label>Job Title<input name="title" value={form.title} onChange={handleChange} placeholder="Frontend Developer Intern" /></label>
+            <label>Company Name<input name="companyName" value={form.companyName} onChange={handleChange} placeholder="TCS" /></label>
+            <label>Location<input name="location" value={form.location} onChange={handleChange} placeholder="Bangalore" /></label>
+            <label>Package<input name="package" value={form.package} onChange={handleChange} placeholder="4.5 LPA" /></label>
+            <label>Type<select name="type" value={form.type} onChange={handleChange}><option>Full Time</option><option>Internship</option><option>Contract</option></select></label>
+            <label>Skills<input name="skills" value={form.skills} onChange={handleChange} placeholder="React, Node.js" /></label>
+            <label>Minimum CGPA<input name="minCgpa" value={form.minCgpa} onChange={handleChange} /></label>
+            <label>Passing Year<input name="passingYear" value={form.passingYear} onChange={handleChange} /></label>
+            <label>Eligible Branches<input name="branches" value={form.branches} onChange={handleChange} placeholder="CSE, IT" /></label>
+            <label>Max Backlogs<input name="maxBacklogs" value={form.maxBacklogs} onChange={handleChange} /></label>
+            <label>Deadline<input type="date" name="deadline" value={form.deadline} onChange={handleChange} /></label>
+            <label className="fullSpan">Description<textarea name="description" value={form.description} onChange={handleChange} /></label>
+            <div className="formActions fullSpan"><button className="primaryButton" type="submit">Post Job</button></div>
+          </form>
+        </section>
+      )}
 
-        <button className="primaryButton" type="submit">Post Job</button>
-      </form>
+      {(isAdmin || isTpo) && (
+        <section className="infoPanel">
+          <p className="eyebrow">Read Only Access</p>
+          <h2>{isAdmin ? 'Admin Job Log' : 'TPO Job Monitoring'}</h2>
+          <p>{isAdmin ? 'Admin can audit all jobs posted by recruiters but cannot create hiring roles.' : 'TPO can monitor jobs for coordination but recruiters create postings.'}</p>
+        </section>
+      )}
 
-      <div className="cardGrid">
-        {list.map((job, index) => (
-          <div className="miniCard jobCard" key={job._id || index}>
-            <h3>{job.title}</h3>
-            <p>{job.company?.name || job.companyName}</p>
-            <span>{job.location || 'Remote / Campus'}</span>
-            <small>{job.salaryPackage || 'Package not added'}</small>
-            <div className="skillLine">{job.skillsRequired || 'Skills not added'}</div>
-          </div>
-        ))}
-      </div>
+      <section className="dataCard">
+        <div className="sectionHeader"><div><p className="eyebrow">Open Roles</p><h2>{isStudent ? 'Apply for Jobs' : 'Job Board'}</h2></div><span className="countPill">{jobs.length} jobs</span></div>
+        <div className="jobGrid">
+          {jobs.map((job) => (
+            <article className="jobCard" key={job._id || job.title}>
+              <div className="jobCardHeader"><div><p className="eyebrow">{job.companyName}</p><h3>{job.title}</h3></div><span className="statusBadge active">{job.type}</span></div>
+              <p className="jobDescription">{job.description}</p>
+              <div className="jobMetaGrid"><span>{job.location}</span><span>{job.package}</span><span>CGPA {job.minCgpa || 'NA'}</span><span>{job.deadline || 'Deadline not added'}</span></div>
+              {isStudent && <button className="primaryButton" onClick={() => applyForJob(job)}>Apply Now</button>}
+            </article>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

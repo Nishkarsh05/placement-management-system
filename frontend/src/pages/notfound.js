@@ -2,13 +2,11 @@ import { Link } from 'react-router-dom';
 
 function NotFound() {
   return (
-    <main className="notFoundPage">
-      <p className="eyebrow">404</p>
+    <main className="notFoundV2">
+      <p className="caption">404</p>
       <h1>Page not found</h1>
-      <p>The page you opened does not exist in this placement portal.</p>
-      <Link className="primaryButton linkButton" to="/dashboard">
-        Back to dashboard
-      </Link>
+      <p>This page does not exist in the placement portal.</p>
+      <Link to="/dashboard">Back to dashboard</Link>
     </main>
   );
 }

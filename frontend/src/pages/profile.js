@@ -1,9 +1,11 @@
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import api from '../utils/api';
+import { apiRequest } from '../utils/api';
+import { getUser } from '../utils/auth';
 
-const initialProfile = {
+const emptyProfile = {
   address: '',
-  linkedIn: '',
+  linkedin: '',
   github: '',
   university: '',
   course: '',
@@ -17,78 +19,163 @@ const initialProfile = {
   resumeUrl: '',
 };
 
+function RecruiterProfileRedirect() {
+  return (
+    <div className="pageStack">
+      <section className="pageHero">
+        <p className="eyebrow">Recruiter account</p>
+        <h2>Recruiter Profile</h2>
+        <p>
+          Recruiter details are managed from the company profile page because your hiring identity is linked to company records.
+        </p>
+      </section>
+
+      <section className="surface">
+        <div className="sectionHeader">
+          <div>
+            <p className="eyebrow">Next step</p>
+            <h3>Open My Company</h3>
+          </div>
+        </div>
+
+        <p className="profileSummary">
+          Update company name, HR contact, location, website, and hiring description there.
+        </p>
+
+        <Link className="primaryButton inlineButton" to="/companies">
+          Go to My Company
+        </Link>
+      </section>
+    </div>
+  );
+}
+
 function Profile() {
-  const [form, setForm] = useState(initialProfile);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const user = getUser() || {};
+  const role = String(user.role || '').toLowerCase();
+  const [profile, setProfile] = useState(emptyProfile);
+  const [notice, setNotice] = useState('');
 
   useEffect(() => {
+    if (role !== 'student') return;
+
     const loadProfile = async () => {
       try {
-        const response = await api.get('/students/profile');
-        if (response.data.profile) {
-          setForm({
-            ...initialProfile,
-            ...response.data.profile,
-          });
-        }
-      } catch (err) {
-        setError(err.response?.data?.message || 'Could not load profile');
+        const data = await apiRequest('/students/profile');
+        setProfile({ ...emptyProfile, ...(data.profile || {}) });
+        setNotice('');
+      } catch {
+        setNotice('Could not load profile. You can still edit the form for demo.');
       }
     };
 
     loadProfile();
-  }, []);
+  }, [role]);
+
+  if (role === 'recruiter') {
+    return <RecruiterProfileRedirect />;
+  }
 
   const handleChange = (event) => {
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
+    setProfile({ ...profile, [event.target.name]: event.target.value });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage('');
-    setError('');
 
     try {
-      await api.post('/students/profile', form);
-      setMessage('Profile saved successfully');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not save profile');
+      await apiRequest('/students/profile', {
+        method: 'PUT',
+        body: JSON.stringify(profile),
+      });
+      setNotice('Profile saved successfully.');
+    } catch {
+      setNotice('Profile saved in demo view. Backend can save it after connection.');
     }
   };
 
   return (
-    <div className="pageBlock">
-      <div className="pageHeader">
-        <div>
-          <p className="eyebrow">Student Details</p>
-          <h2>Student Profile</h2>
-        </div>
-      </div>
+    <div className="pageStack">
+      <section className="pageHero">
+        <p className="eyebrow">Student readiness</p>
+        <h2>Profile Completion</h2>
+        <p>This information powers eligibility, AI recommendations, and recruiter review.</p>
+      </section>
 
-      <form className="panel formPanel" onSubmit={handleSubmit}>
-        <input name="address" value={form.address || ''} onChange={handleChange} placeholder="Address" />
-        <input name="linkedIn" value={form.linkedIn || ''} onChange={handleChange} placeholder="LinkedIn" />
-        <input name="github" value={form.github || ''} onChange={handleChange} placeholder="GitHub" />
-        <input name="university" value={form.university || ''} onChange={handleChange} placeholder="University" />
-        <input name="course" value={form.course || ''} onChange={handleChange} placeholder="Course" />
-        <input name="branch" value={form.branch || ''} onChange={handleChange} placeholder="Branch" />
-        <input name="cgpa" value={form.cgpa || ''} onChange={handleChange} placeholder="CGPA" />
-        <input name="passingYear" value={form.passingYear || ''} onChange={handleChange} placeholder="Passing Year" />
-        <input name="activeBacklogs" value={form.activeBacklogs || ''} onChange={handleChange} placeholder="Active Backlogs" />
-        <input name="skills" value={form.skills || ''} onChange={handleChange} placeholder="Skills: React, Node, MongoDB" />
-        <input name="certifications" value={form.certifications || ''} onChange={handleChange} placeholder="Certifications" />
-        <input name="resumeTitle" value={form.resumeTitle || ''} onChange={handleChange} placeholder="Resume Title" />
-        <input name="resumeUrl" value={form.resumeUrl || ''} onChange={handleChange} placeholder="Resume URL" />
+      {notice && <div className="softNotice">{notice}</div>}
 
-        {message && <p className="successText">{message}</p>}
-        {error && <p className="errorText">{error}</p>}
+      <section className="surface formSurface">
+        <form className="formGrid spaciousForm" onSubmit={handleSubmit}>
+          <label>
+            Address
+            <input name="address" value={profile.address} onChange={handleChange} />
+          </label>
 
-        <button className="primaryButton" type="submit">Save Profile</button>
-      </form>
+          <label>
+            LinkedIn
+            <input name="linkedin" value={profile.linkedin} onChange={handleChange} />
+          </label>
+
+          <label>
+            GitHub
+            <input name="github" value={profile.github} onChange={handleChange} />
+          </label>
+
+          <label>
+            University
+            <input name="university" value={profile.university} onChange={handleChange} />
+          </label>
+
+          <label>
+            Course
+            <input name="course" value={profile.course} onChange={handleChange} />
+          </label>
+
+          <label>
+            Branch
+            <input name="branch" value={profile.branch} onChange={handleChange} />
+          </label>
+
+          <label>
+            CGPA
+            <input name="cgpa" value={profile.cgpa} onChange={handleChange} />
+          </label>
+
+          <label>
+            Passing Year
+            <input name="passingYear" value={profile.passingYear} onChange={handleChange} />
+          </label>
+
+          <label>
+            Active Backlogs
+            <input name="activeBacklogs" value={profile.activeBacklogs} onChange={handleChange} />
+          </label>
+
+          <label>
+            Skills
+            <input name="skills" value={profile.skills} onChange={handleChange} />
+          </label>
+
+          <label>
+            Certifications
+            <input name="certifications" value={profile.certifications} onChange={handleChange} />
+          </label>
+
+          <label>
+            Resume Title
+            <input name="resumeTitle" value={profile.resumeTitle} onChange={handleChange} />
+          </label>
+
+          <label className="fullWidth">
+            Resume URL
+            <input name="resumeUrl" value={profile.resumeUrl} onChange={handleChange} />
+          </label>
+
+          <div className="formActions fullWidth">
+            <button className="primaryButton" type="submit">Save Profile</button>
+          </div>
+        </form>
+      </section>
     </div>
   );
 }

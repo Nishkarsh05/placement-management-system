@@ -1,95 +1,165 @@
 function Reports() {
-  const departmentData = [
-    { name: 'CSE', value: 82 },
-    { name: 'IT', value: 74 },
-    { name: 'ECE', value: 61 },
-    { name: 'ME', value: 48 },
+  const placementStatus = [
+    { label: 'Placed', value: 68, color: '#2872e8' },
+    { label: 'Interview', value: 14, color: '#f59e0b' },
+    { label: 'Applied', value: 12, color: '#16a34a' },
+    { label: 'Not Placed', value: 6, color: '#dc2626' },
   ];
 
-  const placementFlow = [
-    'Registered',
-    'Profile Complete',
-    'Applied',
-    'Shortlisted',
-    'Interview',
-    'Offer',
+  const departmentStats = [
+    { department: 'CSE', students: 120, placed: 86, rate: '72%' },
+    { department: 'IT', students: 92, placed: 61, rate: '66%' },
+    { department: 'ECE', students: 76, placed: 45, rate: '59%' },
+    { department: 'ME', students: 48, placed: 22, rate: '46%' },
+  ];
+
+  const packageStats = [
+    { label: '3-5 LPA', value: 42 },
+    { label: '5-8 LPA', value: 34 },
+    { label: '8-12 LPA', value: 18 },
+    { label: '12+ LPA', value: 6 },
+  ];
+
+  const pipeline = [
+    { label: 'Registered', value: 320 },
+    { label: 'Applied', value: 210 },
+    { label: 'Shortlisted', value: 86 },
+    { label: 'Interview', value: 48 },
+    { label: 'Selected', value: 126 },
   ];
 
   return (
-    <div className="pageBlock">
-      <div className="pageHeader">
+    <div className="pageStack">
+      <section className="pageHero">
         <div>
           <p className="eyebrow">Placement Analytics</p>
-          <h2>Reports</h2>
+          <h1>Reports</h1>
+          <p>Track placement performance, department results, package ranges, and hiring pipeline.</p>
         </div>
-      </div>
+      </section>
 
-      <div className="statsGrid">
-        <div className="statCard">
+      <section className="reportStatsGrid">
+        <div className="metricCard">
           <p>Placement Rate</p>
-          <h3>68%</h3>
+          <h2>68%</h2>
           <span>Current batch</span>
         </div>
 
-        <div className="statCard">
+        <div className="metricCard">
           <p>Average Package</p>
-          <h3>6.4 LPA</h3>
-          <span>Across selected students</span>
+          <h2>6.4 LPA</h2>
+          <span>Selected students</span>
         </div>
 
-        <div className="statCard">
+        <div className="metricCard">
           <p>Highest Package</p>
-          <h3>18 LPA</h3>
-          <span>Current season</span>
+          <h2>18 LPA</h2>
+          <span>Top offer</span>
         </div>
 
-        <div className="statCard">
+        <div className="metricCard">
           <p>Interviews</p>
-          <h3>54</h3>
+          <h2>48</h2>
           <span>Scheduled rounds</span>
         </div>
-      </div>
+      </section>
 
-      <div className="analyticsGrid">
-        <section className="panel">
-          <h3>Department Wise Placement</h3>
+      <section className="reportsGrid">
+        <div className="reportCard">
+          <div className="sectionHeader">
+            <div>
+              <p className="eyebrow">Status Split</p>
+              <h2>Placement Overview</h2>
+            </div>
+          </div>
 
-          {departmentData.map((item) => (
-            <div className="progressRow" key={item.name}>
-              <span>{item.name}</span>
-              <div>
-                <b style={{ width: `${item.value}%` }} />
+          <div className="pieArea">
+            <div className="pieChart" />
+
+            <div className="legendList">
+              {placementStatus.map((item) => (
+                <div className="legendItem" key={item.label}>
+                  <span style={{ background: item.color }} />
+                  <p>{item.label}</p>
+                  <strong>{item.value}%</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="reportCard">
+          <div className="sectionHeader">
+            <div>
+              <p className="eyebrow">Packages</p>
+              <h2>Offer Distribution</h2>
+            </div>
+          </div>
+
+          <div className="barChart">
+            {packageStats.map((item) => (
+              <div className="barRow" key={item.label}>
+                <span>{item.label}</span>
+                <div className="barTrack">
+                  <div className="barFill" style={{ width: `${item.value}%` }} />
+                </div>
+                <strong>{item.value}%</strong>
               </div>
-              <strong>{item.value}%</strong>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="reportCard">
+        <div className="sectionHeader">
+          <div>
+            <p className="eyebrow">Hiring Funnel</p>
+            <h2>Placement Pipeline</h2>
+          </div>
+        </div>
+
+        <div className="pipelineGraph">
+          {pipeline.map((item, index) => (
+            <div className="pipelineStep" key={item.label}>
+              <div className="pipelineCircle">{item.value}</div>
+              <p>{item.label}</p>
+              {index < pipeline.length - 1 && <div className="pipelineLine" />}
             </div>
           ))}
-        </section>
+        </div>
+      </section>
 
-        <section className="panel chartPanel">
-          <h3>Placement Split</h3>
-
-          <div className="pieChart">
-            <span>68%</span>
+      <section className="reportCard">
+        <div className="sectionHeader">
+          <div>
+            <p className="eyebrow">Department Performance</p>
+            <h2>Department Wise Report</h2>
           </div>
+        </div>
 
-          <div className="chartLegend">
-            <p><b className="dot placed" /> Placed Students</p>
-            <p><b className="dot active" /> Active Applications</p>
-            <p><b className="dot pending" /> Pending Students</p>
-          </div>
-        </section>
-      </div>
-
-      <section className="panel">
-        <h3>Hiring Flow</h3>
-
-        <div className="flowChart">
-          {placementFlow.map((step, index) => (
-            <div className="flowStep" key={step}>
-              <div>{index + 1}</div>
-              <span>{step}</span>
-            </div>
-          ))}
+        <div className="tableWrap">
+          <table className="dataTable">
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Total Students</th>
+                <th>Placed</th>
+                <th>Placement Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {departmentStats.map((row) => (
+                <tr key={row.department}>
+                  <td>{row.department}</td>
+                  <td>{row.students}</td>
+                  <td>{row.placed}</td>
+                  <td>
+                    <span className="statusBadge selected">{row.rate}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
     </div>

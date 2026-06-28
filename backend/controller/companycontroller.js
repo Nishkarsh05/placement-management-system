@@ -3,7 +3,6 @@ const Company = require('../model/company');
 const getCompanies = async (req, res) => {
   try {
     const companies = await Company.find().sort({ createdAt: -1 });
-
     res.json({ companies });
   } catch (error) {
     res.status(500).json({
@@ -18,9 +17,7 @@ const createCompany = async (req, res) => {
     const { name, industry, website, location, description, hrName, hrEmail, hrPhone } = req.body;
 
     if (!name) {
-      return res.status(400).json({
-        message: 'Company name is required',
-      });
+      return res.status(400).json({ message: 'Company name is required' });
     }
 
     const company = await Company.create({
@@ -32,6 +29,7 @@ const createCompany = async (req, res) => {
       hrName,
       hrEmail,
       hrPhone,
+      logoText: name.charAt(0).toUpperCase(),
       createdBy: req.user._id,
     });
 
