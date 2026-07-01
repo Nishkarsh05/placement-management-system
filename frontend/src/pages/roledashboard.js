@@ -1,192 +1,161 @@
 import { Link } from 'react-router-dom';
 import { getUser } from '../utils/auth';
 
-const recruiterPipeline = [
-  { label: 'New Applications', count: 18, path: '/applications', color: 'blue', text: 'Review students who recently applied.' },
-  { label: 'Candidates', count: 11, path: '/candidates', color: 'gray', text: 'Open student profiles and resumes.' },
-  { label: 'Shortlisted', count: 7, path: '/shortlisted', color: 'green', text: 'Continue with interview-ready candidates.' },
-  { label: 'Interviews', count: 4, path: '/interviews', color: 'orange', text: 'Track interview-stage applications.' },
-  { label: 'Selected', count: 3, path: '/applications', color: 'green', text: 'Final selected candidates.' },
-  { label: 'Messages', count: 6, path: '/chat', color: 'blue', text: 'Reply to student questions.' },
-];
-
-const tpoCards = [
-  { label: 'Students', count: 320, path: '/students', color: 'blue', text: 'Monitor eligible student records.' },
-  { label: 'Companies', count: 42, path: '/companies', color: 'green', text: 'View recruiting partners.' },
-  { label: 'Jobs', count: 18, path: '/jobs', color: 'orange', text: 'Review open job postings.' },
-  { label: 'Applications', count: 240, path: '/applications', color: 'blue', text: 'Track student application flow.' },
-  { label: 'Interviews', count: 12, path: '/interviews', color: 'gray', text: 'Monitor interview schedules.' },
-  { label: 'Drives', count: 6, path: '/drives', color: 'green', text: 'Coordinate campus drives.' },
-];
-
-const tpoAlerts = [
-  { title: 'Infosys drive needs lab confirmation', path: '/drives' },
-  { title: '12 students missing resume links', path: '/students' },
-  { title: 'Amazon interview schedule pending', path: '/interviews' },
-  { title: 'CSE placement report ready for review', path: '/reports' },
-];
-
-const placementProgress = [
-  { department: 'CSE', eligible: 120, placed: 58, percentage: 48 },
-  { department: 'IT', eligible: 84, placed: 41, percentage: 49 },
-  { department: 'ECE', eligible: 62, placed: 20, percentage: 32 },
-  { department: 'ME', eligible: 54, placed: 7, percentage: 13 },
-];
-
-const fallbackDashboards = {
+const dashboardData = {
   student: {
+    eyebrow: 'Student Workspace',
     title: 'Student Dashboard',
-    subtitle: 'Track applications, jobs, profile readiness, and interviews.',
-    cards: [
-      { label: 'Recommended Jobs', value: '12', path: '/jobs' },
-      { label: 'Applications', value: '4', path: '/applications' },
-      { label: 'Profile', value: '78%', path: '/profile' },
-      { label: 'Chat', value: '2', path: '/chat' },
+    subtitle: 'Track applications, recommended jobs, profile readiness, and placement updates.',
+    stats: [
+      { label: 'Recommended Jobs', value: '12', note: 'Open roles matching your profile', path: '/jobs' },
+      { label: 'Applications', value: '4', note: 'Requests submitted', path: '/applications' },
+      { label: 'Profile Score', value: '78%', note: 'Resume and skills readiness', path: '/profile' },
+      { label: 'Messages', value: '2', note: 'Recruiter conversations', path: '/chat' },
     ],
+    primaryTitle: 'Next Best Actions',
+    actions: [
+      { title: 'Complete your profile', text: 'Add resume, skills, GitHub, LinkedIn, CGPA, and certifications.', path: '/profile' },
+      { title: 'Apply to recommended jobs', text: 'Check roles that match your branch, CGPA, and skills.', path: '/jobs' },
+      { title: 'Review application status', text: 'See whether you are applied, shortlisted, interviewed, or selected.', path: '/applications' },
+    ],
+    sideTitle: 'Placement Readiness',
+    sideItems: ['Resume uploaded', 'Skills added', 'CGPA verified', 'Applications active'],
   },
-  admin: {
-    title: 'Admin Dashboard',
-    subtitle: 'Manage users, companies, jobs, applications, and reports.',
-    cards: [
-      { label: 'Students', value: '320', path: '/students' },
-      { label: 'Companies', value: '42', path: '/companies' },
-      { label: 'Applications', value: '240', path: '/applications' },
-      { label: 'Reports', value: 'Open', path: '/reports' },
+
+  recruiter: {
+    eyebrow: 'Recruiter Workspace',
+    title: 'Recruiter Dashboard',
+    subtitle: 'Manage candidates, posted jobs, interview rounds, and hiring decisions.',
+    stats: [
+      { label: 'Open Jobs', value: '5', note: 'Currently accepting applications', path: '/jobs' },
+      { label: 'New Candidates', value: '18', note: 'Waiting for review', path: '/students' },
+      { label: 'Shortlisted', value: '7', note: 'Ready for interview', path: '/shortlisted' },
+      { label: 'Selected', value: '3', note: 'Final hiring decisions', path: '/applications' },
     ],
+    primaryTitle: 'Recruiter Priority Work',
+    actions: [
+      { title: 'Review new candidates', text: 'Open the candidate list and inspect student profiles.', path: '/students' },
+      { title: 'Schedule interviews', text: 'Create interview rounds for shortlisted students.', path: '/interviews' },
+      { title: 'Update application decisions', text: 'Move students from applied to shortlisted, selected, or rejected.', path: '/applications' },
+    ],
+    sideTitle: 'Hiring Pipeline',
+    sideItems: ['New applications', 'Profile review', 'Shortlist', 'Interview', 'Final decision'],
+  },
+
+  tpo: {
+    eyebrow: 'TPO Workspace',
+    title: 'TPO Dashboard',
+    subtitle: 'Monitor campus drives, students, recruiters, interviews, and placement analytics.',
+    stats: [
+      { label: 'Students', value: '320', note: 'Registered candidates', path: '/students' },
+      { label: 'Companies', value: '42', note: 'Recruiting partners', path: '/companies' },
+      { label: 'Interviews', value: '38', note: 'Scheduled rounds', path: '/interviews' },
+      { label: 'Placement Rate', value: '68%', note: 'Current batch', path: '/reports' },
+    ],
+    primaryTitle: 'TPO Coordination',
+    actions: [
+      { title: 'Monitor student records', text: 'Check readiness, branch data, CGPA, and application activity.', path: '/students' },
+      { title: 'Track company drives', text: 'Review recruiting partners and active campus drives.', path: '/companies' },
+      { title: 'Analyze reports', text: 'View placement rate, department performance, and package summary.', path: '/reports' },
+    ],
+    sideTitle: "Today's Checklist",
+    sideItems: ['Verify interview schedule', 'Check pending applications', 'Update placement report', 'Coordinate with recruiters'],
+  },
+
+  admin: {
+    eyebrow: 'Admin Workspace',
+    title: 'Admin Dashboard',
+    subtitle: 'Manage users, recruiter access, records, reports, settings, and system cleanup.',
+    stats: [
+      { label: 'Users', value: '410', note: 'Total accounts', path: '/admin/users' },
+      { label: 'Recruiters', value: '42', note: 'Company users', path: '/admin/recruiters' },
+      { label: 'Records', value: '586', note: 'Placement records', path: '/applications' },
+      { label: 'Reports', value: '12', note: 'Analytics sections', path: '/reports' },
+    ],
+    primaryTitle: 'Admin Controls',
+    actions: [
+      { title: 'Manage user access', text: 'Approve, deactivate, or update student and recruiter accounts.', path: '/admin/users' },
+      { title: 'Review recruiter accounts', text: 'Check recruiter status and company ownership.', path: '/admin/recruiters' },
+      { title: 'Clean unused records', text: 'Prepare clean demo data before presentation.', path: '/admin/cleanup' },
+    ],
+    sideTitle: 'System Health',
+    sideItems: ['Authentication active', 'Role menus enabled', 'Reports available', 'Cleanup tools ready'],
   },
 };
 
-function SimpleDashboard({ data, role }) {
+function RoleDashboard({ role: forcedRole }) {
+  const user = getUser() || {};
+  const role = forcedRole || user.role || 'student';
+  const data = dashboardData[role] || dashboardData.student;
+
   return (
     <div className="pageStack">
-      <section className="pageHero">
-        <p className="eyebrow">{role} workspace</p>
-        <h2>{data.title}</h2>
-        <p>{data.subtitle}</p>
-      </section>
+      <section className="sectionHero dashboardHero">
+        <div>
+          <p className="eyebrow">{data.eyebrow}</p>
+          <h2>{data.title}</h2>
+          <p>{data.subtitle}</p>
+        </div>
 
-      <section className="metricGrid">
-        {data.cards.map((card) => (
-          <Link className="metricCard clickableCard" to={card.path} key={card.label}>
-            <span>{card.label}</span>
-            <strong>{card.value}</strong>
-            <p>Open {card.label.toLowerCase()}</p>
-          </Link>
-        ))}
-      </section>
-    </div>
-  );
-}
-
-function RecruiterDashboard() {
-  return (
-    <div className="pageStack">
-      <section className="pageHero">
-        <p className="eyebrow">Recruiter workspace</p>
-        <div className="pageHeroRow">
-          <div>
-            <h2>Recruiter Dashboard</h2>
-            <p>Review candidates, manage jobs, update application decisions, and message students.</p>
-          </div>
-
-          <div className="heroButtonGroup">
-            <Link className="primaryButton" to="/candidates">Review Candidates</Link>
-            <Link className="secondaryButton" to="/jobs">Post Job</Link>
-          </div>
+        <div className="heroMiniCard">
+          <span>Signed in as</span>
+          <strong>{user.name || `${role} Demo`}</strong>
+          <small>{String(role).toUpperCase()}</small>
         </div>
       </section>
 
-      <section className="pipelineBoard">
-        {recruiterPipeline.map((item) => (
-          <Link className={`pipelineCard ${item.color}`} to={item.path} key={item.label}>
-            <span>{item.label}</span>
-            <strong>{item.count}</strong>
-            <p>{item.text}</p>
-          </Link>
-        ))}
-      </section>
-    </div>
-  );
-}
-
-function TpoDashboard() {
-  return (
-    <div className="pageStack">
-      <section className="pageHero">
-        <p className="eyebrow">Training and placement office</p>
-        <div className="pageHeroRow">
-          <div>
-            <h2>TPO Dashboard</h2>
-            <p>Coordinate campus drives, monitor placements, and track students, companies, applications, and interviews.</p>
-          </div>
-
-          <div className="heroButtonGroup">
-            <Link className="primaryButton" to="/drives">Manage Drives</Link>
-            <Link className="secondaryButton" to="/reports">View Reports</Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="pipelineBoard">
-        {tpoCards.map((item) => (
-          <Link className={`pipelineCard ${item.color}`} to={item.path} key={item.label}>
-            <span>{item.label}</span>
-            <strong>{item.count}</strong>
-            <p>{item.text}</p>
+      <section className="statsGrid">
+        {data.stats.map((stat) => (
+          <Link className="statCard dashboardStatCard" to={stat.path} key={stat.label}>
+            <span>{stat.label}</span>
+            <strong>{stat.value}</strong>
+            <small>{stat.note}</small>
           </Link>
         ))}
       </section>
 
-      <section className="dashboardSplit">
-        <div className="surface">
-          <div className="sectionHeader">
+      <section className="contentGrid dashboardWorkGrid">
+        <article className="panel">
+          <div className="panelHeader">
             <div>
-              <p className="eyebrow">Coordination</p>
-              <h3>Pending TPO Actions</h3>
+              <p className="eyebrow">Action Plan</p>
+              <h2>{data.primaryTitle}</h2>
             </div>
           </div>
 
-          <div className="quickActions">
-            {tpoAlerts.map((alert) => (
-              <Link to={alert.path} key={alert.title}>{alert.title}</Link>
+          <div className="actionList">
+            {data.actions.map((action) => (
+              <Link className="actionItem" to={action.path} key={action.title}>
+                <div>
+                  <strong>{action.title}</strong>
+                  <p>{action.text}</p>
+                </div>
+                <span>Open</span>
+              </Link>
             ))}
           </div>
-        </div>
+        </article>
 
-        <div className="surface">
-          <div className="sectionHeader">
+        <article className="panel">
+          <div className="panelHeader">
             <div>
-              <p className="eyebrow">Department progress</p>
-              <h3>Placement Progress</h3>
+              <p className="eyebrow">Status</p>
+              <h2>{data.sideTitle}</h2>
             </div>
           </div>
 
-          <div className="barList">
-            {placementProgress.map((item) => (
-              <div className="barRow" key={item.department}>
-                <span>{item.department}</span>
-                <div className="barTrack">
-                  <div className="barFill" style={{ width: `${item.percentage}%` }} />
-                </div>
-                <strong>{item.placed}/{item.eligible}</strong>
+          <div className="checkList">
+            {data.sideItems.map((item) => (
+              <div className="checkItem" key={item}>
+                <span />
+                <p>{item}</p>
               </div>
             ))}
           </div>
-        </div>
+        </article>
       </section>
     </div>
   );
-}
-
-function RoleDashboard() {
-  const user = getUser() || {};
-  const role = String(user.role || 'student').toLowerCase();
-
-  if (role === 'recruiter') return <RecruiterDashboard />;
-  if (role === 'tpo') return <TpoDashboard />;
-
-  const data = fallbackDashboards[role] || fallbackDashboards.student;
-  return <SimpleDashboard data={data} role={role} />;
 }
 
 export default RoleDashboard;

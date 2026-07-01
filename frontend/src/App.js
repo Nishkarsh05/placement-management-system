@@ -65,9 +65,9 @@ function App() {
       >
         <Route path="/dashboard" element={<DashboardRedirect />} />
 
-        <Route path="/student/dashboard" element={<RoleDashboard />} />
-        <Route path="/recruiter/dashboard" element={<RoleDashboard />} />
-        <Route path="/tpo/dashboard" element={<RoleDashboard />} />
+        <Route path="/student/dashboard" element={<RoleDashboard role="student" />} />
+        <Route path="/recruiter/dashboard" element={<RoleDashboard role="recruiter"/>} />
+        <Route path="/tpo/dashboard" element={<RoleDashboard role="tpo"/>} />
 
         <Route path="/profile" element={<Profile />} />
         <Route path="/student/profile" element={<Profile />} />
